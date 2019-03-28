@@ -6,6 +6,7 @@
 *.sql
 *.db
 secrets.txt
+secrets.py
 ./tmp
 ./build/*
 .idea/*
