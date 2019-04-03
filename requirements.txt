@@ -6,3 +6,5 @@ MarkupSafe==1.1.1
 Werkzeug==0.15.1
 sqlalchemy
 psycopg2
+pylint
+pytest
