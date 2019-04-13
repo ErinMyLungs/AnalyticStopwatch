@@ -9,10 +9,10 @@ from src.models import Base
 
 #pylint: disable=C0103
 engine = create_engine(DevConfig.SQLALCHEMY_DATABASE_URI)
-Session = scoped_session(sessionmaker(autocommit=False,
-                                      autoflush=False,
-                                      bind=engine))
-Base.query = Session.query_property()
+db_session = scoped_session(sessionmaker(autocommit=False,
+                                         autoflush=False,
+                                         bind=engine))
+Base.query = db_session.query_property()
 
 
 def init_db():
