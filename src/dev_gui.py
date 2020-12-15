@@ -19,6 +19,7 @@ add_checkbox
 from dearpygui.simple import window
 
 
+
 def debug_get_window_pos(sender, data):
     """
     Debug setup for getting location configs of windows
