@@ -33,9 +33,9 @@ This has basic initialization of screens, loading of fonts, and development tool
 
 #### PyTogglGUI
 This is the timer tracking class. Lots of properties and setters but the meat is:
-* flip_timer_state that activates the stopwatch function
-* render which updates the clock/timer text on each frame draw
-* run which builds the timer window itself
+* `flip_timer_state` that activates the stopwatch function
+* `render` which updates the clock/timer text on each frame draw
+* `run` which builds the timer window itself
 
 Creating the GUI can be as simple as:
 ```python
