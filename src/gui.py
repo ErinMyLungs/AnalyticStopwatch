@@ -58,6 +58,9 @@ class PyTogglGUI(BaseGUI):
 
     @property
     def tracking(self):
+        """
+        Bool of if the stopwatch should be active
+        """
         return c.get_data("tracking")
 
     def set_tracking(self, value: Optional[bool] = None):
@@ -91,6 +94,9 @@ class PyTogglGUI(BaseGUI):
 
     @property
     def time_delta(self):
+        """
+        Gives delta between now and start time of timer.
+        """
         return datetime.datetime.now() - self.start_time
 
     def initialize_tracking_data(self):
@@ -125,13 +131,13 @@ class PyTogglGUI(BaseGUI):
         self.set_tracking()
         self.set_start_time()
 
-    def run(self, width=300, height=300, **kwargs):
+    def run(self, width: int = 300, height: int = 300, **kwargs):
         """
         GUI definition and runs dearpygui
-        :param width:
-        :param height:
-        :param kwargs:
-        :return:
+        :param width: pixel width of main window
+        :param height: pixel height of main window
+        :param kwargs: any simple.window kwargs
+        :return:GUI although more probably 'void'
         """
         with s.window(
             name="Timer",
