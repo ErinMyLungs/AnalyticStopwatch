@@ -80,13 +80,13 @@ class BaseGUI:
 
 
 class PyTogglGUI(BaseGUI):
-    def __init__(self, db_uri: str, **kwargs):
+    def __init__(self, db_uri: str = 'sqlite:///data/timer.db', **kwargs):
         """
         :param db_uri: Local sqlite database for saving data to
         :param kwargs: accepts base class arguments
         """
         super().__init__(**kwargs)
-        self.db_uri = db_uri
+        self.db_uri = f"sqlite://{db_uri}" if db_uri.find('sqlite://') else db_uri
 
         self.initialize_tracking_data()
 
@@ -96,6 +96,10 @@ class PyTogglGUI(BaseGUI):
         """
         c.add_data("tracking", False)
         c.add_data("start_time", datetime.datetime.now())
+
+    @staticmethod
+    def generate_sqlite_uri(db_uri: str) -> str:
+        ...
 
     @property
     def tracking(self):
@@ -140,7 +144,7 @@ class PyTogglGUI(BaseGUI):
         """
         return datetime.datetime.now() - self.start_time
 
-    def flip_timer_state(self, caller, data):
+    def flip_timer_state(self, *args):
         """
         Flips tracking bool, sets starting time, and flips button label
         :return:
@@ -153,7 +157,7 @@ class PyTogglGUI(BaseGUI):
         self.set_tracking()
         self.set_start_time()
 
-    def render(self, sender, data):
+    def render(self, *args):
         """
         Updates timer text continuously
         """
@@ -194,11 +198,10 @@ class PyTogglGUI(BaseGUI):
             c.add_combo(
                 name="Project", items=["CEO School", "Set Tracker", "Type Two Tech"]
             )
-
         c.set_render_callback(self.render)
         c.start_dearpygui()
 
 
 if __name__ == "__main__":
-    gui = PyTogglGUI(development=False, db_uri="")
+    gui = PyTogglGUI(development=True, db_uri="")
     gui.run()
