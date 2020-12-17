@@ -1,3 +1,4 @@
+""" GUI module, contains BaseGUI class and PyTogglGUI subclass """
 import datetime
 from typing import Tuple, Optional
 
