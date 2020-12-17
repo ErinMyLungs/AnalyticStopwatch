@@ -1,0 +1,23 @@
+[
+  {
+    "weekly_hour_allotment": 25,
+    "monthly_frequency": 4,
+    "rate": 15,
+    "client": "Sketchy guy in a suit",
+    "project_name": "Side Gig"
+  },
+  {
+    "weekly_hour_allotment": 15,
+    "monthly_frequency": 1,
+    "rate": 500,
+    "client": "Richy Richardson",
+    "project_name": "That Big Money Gig"
+  },
+  {
+    "weekly_hour_allotment": 10,
+    "monthly_frequency": 2,
+    "rate": 30,
+    "client": "Mental Health Inc.",
+    "project_name": "Automating Breakdowns"
+  }
+]
