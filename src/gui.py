@@ -18,11 +18,16 @@ class BaseGUI:
     ):
         """
         Base parameters for GUI
-        :param development: If True launches logger + debugger
-        :param dev_window_size: Dev window size, typically larger to accommodate dev tools
-        :param prod_window_size: Size if dev == False, usually the size of the main window
-        :param title: Title for Window
-        :param logger: Name for logger
+        :keyword development: If True launches logger + debugger
+        :type development: bool
+        :keyword dev_window_size: Dev window size, typically larger to accommodate dev tools
+        :type dev_window_size: Tuple[int, int]
+        :keyword prod_window_size: Size if dev == False, usually the size of the main window
+        :type prod_window_size: Tuple[int, int]
+        :keyword title: Title for Window
+        :type title: str
+        :keyword logger: Name for logger
+        :type logger: str
         """
         self.development = development
         self.title = title
@@ -81,13 +86,22 @@ class BaseGUI:
 
 
 class PyTogglGUI(BaseGUI):
-    def __init__(self, db_uri: str = 'sqlite:///data/timer.db', **kwargs):
+    def __init__(self, **kwargs):
         """
-        :param db_uri: Local sqlite database for saving data to
-        :param kwargs: accepts base class arguments
+        Stopwatch class, builds out the GUI portion of PyToggl
+
+        :keyword development: If True launches logger + debugger
+        :type development: bool
+        :keyword dev_window_size: Dev window size, typically larger to accommodate dev tools
+        :type dev_window_size: Tuple[int, int]
+        :keyword prod_window_size: Size if dev == False, usually the size of the main window
+        :type prod_window_size: Tuple[int, int]
+        :keyword title: Title for Window
+        :type title: str
+        :keyword logger: Name for logger
+        :type logger: str
         """
         super().__init__(**kwargs)
-        self.db_uri = f"sqlite://{db_uri}" if db_uri.find('sqlite://') else db_uri
 
         self.initialize_tracking_data()
 
@@ -148,7 +162,8 @@ class PyTogglGUI(BaseGUI):
     def flip_timer_state(self, *args):
         """
         Flips tracking bool, sets starting time, and flips button label
-        :return:
+        :arg sender: Callback widget name in pos 0
+        :arg data: callback_data setting in widget in pos 1
         """
         if self.tracking:
             label = "Start Timer"
@@ -204,5 +219,5 @@ class PyTogglGUI(BaseGUI):
 
 
 if __name__ == "__main__":
-    gui = PyTogglGUI(development=True, db_uri="")
+    gui = PyTogglGUI(development=True)
     gui.run()
