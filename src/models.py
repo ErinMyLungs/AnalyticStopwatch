@@ -24,11 +24,15 @@ class ModelHelperMixin:
 class Entry(ModelHelperMixin):
     """
     Defines a simple entry dataclass for db handling
+    :parameter project: Project name
+    :parameter description: Task description string
+    :parameter start_time: start time in datetime format
+    :parameter end_time: end_time, default is creation time
     """
     project: str
     description: str
     start_time: datetime.datetime
-    end_time: datetime.datetime = datetime.datetime.now()
+    end_time: datetime.datetime
 
     def duration(self):
         return self.end_time - self.start_time
