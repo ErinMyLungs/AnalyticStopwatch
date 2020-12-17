@@ -1,5 +1,5 @@
 """ Contains database mixin class """
-from typing import Tuple
+from typing import Tuple, Union
 
 import dataset
 from .models import Entry, Project
@@ -47,3 +47,36 @@ class DatabaseMixin:
                 projects_table.insert(project)
 
         return projects_table, entries_table
+
+    def add_entry(self, entry: Entry, return_value: bool = False) -> Union[int, Entry]:
+        """
+        Adds entry to entries tables
+        :param entry: Entry to insert
+        :type entry: Entry
+        :param return_value: If to return the updated entry
+        :type return_value: bool
+        :return: created ID or entry if return_value is True
+        """
+        inserted_id = self.entries.insert(entry.to_dict())
+        if not return_value:
+            return inserted_id
+        else:
+            return self.entries.find_one(id=inserted_id)
+
+    def add_project(
+        self, project: Project, return_value: bool = False
+    ) -> Union[int, Project]:
+        """
+        Insert project into project table
+        :param project: Project dataclass to insert
+        :type project: Project
+        :param return_value: If True return updated Project
+        :type return_value: bool
+        :return: db ID or Project if return_value is True
+        """
+        inserted_id = self.entries.insert(project.to_dict())
+
+        if not return_value:
+            return inserted_id
+        else:
+            return self.projects.find_one(id=inserted_id)
