@@ -29,13 +29,17 @@ class Entry(ModelHelperMixin):
     :parameter start_time: start time in datetime format
     :parameter end_time: end_time, default is creation time
     """
+    @property
+    def duration(self):
+        return self.end_time - self.start_time
+
     project: str
     description: str
     start_time: datetime.datetime
     end_time: datetime.datetime
+    _duration = duration
 
-    def duration(self):
-        return self.end_time - self.start_time
+
 
 
 @dataclass
