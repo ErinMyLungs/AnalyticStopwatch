@@ -5,7 +5,7 @@ from typing import Tuple, Optional, Union
 import dearpygui.core as c
 import dearpygui.simple as s
 from dev_gui import start_development_windows
-from database import DatabaseMixin
+from database import Database
 from models import Entry, Project
 
 
@@ -105,8 +105,8 @@ class PyTogglGUI(BaseGUI):
         """
         super().__init__(**kwargs)
 
-        self.db = DatabaseMixin()
-
+        self.db = Database(development=self.development)
+        self.projects = self.db.get_project_names()
         self.initialize_tracking_data()
 
     def initialize_tracking_data(self):
@@ -240,7 +240,7 @@ class PyTogglGUI(BaseGUI):
             c.add_text(name="TimerText", source="timer_text")
             c.add_button(name="Start Timer", callback=self.flip_timer_state)
             c.add_combo(
-                name="Project", items=["CEO School", "Set Tracker", "Type Two Tech"]
+                name="Project", items=self.projects
             )
         c.set_render_callback(self.render)
         c.start_dearpygui()
