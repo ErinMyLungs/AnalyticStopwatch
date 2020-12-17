@@ -1,10 +1,12 @@
 """ GUI module, contains BaseGUI class and PyTogglGUI subclass """
 import datetime
-from typing import Tuple, Optional
+from typing import Tuple, Optional, Union
 
 import dearpygui.core as c
 import dearpygui.simple as s
 from dev_gui import start_development_windows
+from database import DatabaseMixin
+from models import Entry, Project
 
 
 class BaseGUI:
@@ -13,7 +15,7 @@ class BaseGUI:
         development: bool = False,
         dev_window_size: Tuple[int, int] = (800, 800),
         prod_window_size: Tuple[int, int] = (300, 300),
-        title: str = "Py Toggl",
+        title: str = "PyToggl",
         logger: str = "",
     ):
         """
@@ -103,6 +105,8 @@ class PyTogglGUI(BaseGUI):
         """
         super().__init__(**kwargs)
 
+        self.db = DatabaseMixin()
+
         self.initialize_tracking_data()
 
     def initialize_tracking_data(self):
@@ -111,10 +115,6 @@ class PyTogglGUI(BaseGUI):
         """
         c.add_data("tracking", False)
         c.add_data("start_time", datetime.datetime.now())
-
-    @staticmethod
-    def generate_sqlite_uri(db_uri: str) -> str:
-        ...
 
     @property
     def tracking(self):
@@ -159,6 +159,10 @@ class PyTogglGUI(BaseGUI):
         """
         return datetime.datetime.now() - self.start_time
 
+    @property
+    def project(self):
+        return c.get_value("Project")
+
     def flip_timer_state(self, *args):
         """
         Flips tracking bool, sets starting time, and flips button label
@@ -167,11 +171,35 @@ class PyTogglGUI(BaseGUI):
         """
         if self.tracking:
             label = "Start Timer"
+            self.save_new_entry()
+
         else:
             label = "End Timer"
+
         s.set_item_label("Start Timer", label=label)
         self.set_tracking()
         self.set_start_time()
+
+    def save_new_entry(self, return_value: bool = False) -> Union[None, Entry]:
+        """
+        Inserts timer entry to entries table
+        :param return_value: Option to return the created entry
+        :type return_value: bool
+        :return: None or created entry in db.
+        """
+        entry_to_insert = Entry(
+            id=None,
+            project=self.project,
+            description="",
+            start_time=self.start_time,
+            end_time=datetime.datetime.now(),
+        )
+        updated_entry = self.db.add_entry(entry_to_insert, return_value=return_value)
+
+        if return_value is True:
+            return updated_entry
+        else:
+            return
 
     def render(self, *args):
         """

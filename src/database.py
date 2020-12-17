@@ -2,7 +2,7 @@
 from typing import Tuple, Union
 
 import dataset
-from .models import Entry, Project
+from models import Entry, Project
 from pathlib import Path
 import json
 
@@ -61,7 +61,7 @@ class DatabaseMixin:
         if not return_value:
             return inserted_id
         else:
-            return self.entries.find_one(id=inserted_id)
+            return Entry(**self.entries.find_one(id=inserted_id))
 
     def add_project(
         self, project: Project, return_value: bool = False
