@@ -1,20 +1,52 @@
 """ Contains database mixin class """
-from typing import Tuple, Union
+from typing import Tuple, Union, List, Generator, Any
 
 import dataset
 from models import Entry, Project
 from pathlib import Path
 import json
+import functools
 
 
-class DatabaseMixin:
-    def __init__(self, db_uri: str = "sqlite:///data/timer.db"):
+def as_project(query):
+    """
+    Decorator to load query results up as Project
+    """
+
+    def wrapper(*args, **kwargs):
+        query_result = query(*args, **kwargs)
+        for result in query_result:
+            yield Project(**result)
+
+    return wrapper
+
+
+def as_entry(query):
+    """
+    Decorator to return entries loaded as Entry dataclasses
+    """
+
+    def wrapper(*args, **kwargs):
+        query_result = query(*args, **kwargs)
+        for result in query_result:
+            yield Entry(**result)
+
+    return wrapper
+
+
+class Database:
+    def __init__(
+        self, db_uri: str = "sqlite:///data/timer.db", development: bool = False
+    ):
         """
         :param db_uri: path to sqlite db file. Either path or URI
         :type db_uri: str
+        :param development: Flag that wipes and re-inits the database
+        :type development: bool
         """
         self._db_uri = f"sqlite://{db_uri}" if db_uri.find("sqlite://") else db_uri
         self.db: dataset.database.Database = dataset.connect(self._db_uri)
+        self.development = development
         self.projects, self.entries = self.init_db()
 
     def init_db(self) -> Tuple[dataset.table.Table, dataset.table.Table]:
@@ -22,6 +54,11 @@ class DatabaseMixin:
         Initializes the database and creates the tables if they don't exist.
         :return: returns the projects and entry tables
         """
+        if self.development is True:
+            """ Wipes DB before recreating for development """
+            for file in Path().glob("**/timer.db*"):
+                file.unlink()
+
         tables = self.db.tables
 
         seed_db = False
@@ -80,3 +117,60 @@ class DatabaseMixin:
             return inserted_id
         else:
             return self.projects.find_one(id=inserted_id)
+
+    @staticmethod
+    def _eager_loader(query: callable, eager_loading: bool, **kwargs):
+        query_result = query(**kwargs)
+        if eager_loading:
+            query_result = list(query_result)
+            if len(query_result) == 1:
+                return query_result[0]
+            else:
+                return query_result
+        else:
+            return query_result
+
+    @as_project
+    def get_all_projects(self, eager_loading: bool = False):
+        return self._eager_loader(self.get_multi_projects, eager_loading=eager_loading)
+
+    @as_project
+    def _get_multi_projects(self, **kwargs):
+        return self.projects.find(**kwargs)
+
+    def get_multi_projects(self, eager_loading: bool = False, **kwargs):
+        """
+        Returns project query fetched matching kwarg values
+        :param eager_loading: if True returns value in memory, else generator
+        :param kwargs: id, weekly_hour_allotment, monthly_frequency, client, and project_name
+        :return: Generator, list, or single instance of Project
+        """
+        return self._eager_loader(
+            self._get_multi_projects, eager_loading=eager_loading, **kwargs
+        )
+
+    @as_entry
+    def _get_multi_entries(self, **kwargs):
+        return self.entries.find(**kwargs)
+
+    def get_all_entries(self, eager_loading: bool = False):
+        return self._eager_loader(self._get_multi_entries, eager_loading=eager_loading)
+
+    def get_multi_entries(self, eager_loading: bool = False, **kwargs):
+        return self._eager_loader(
+            self._get_multi_entries, eager_loading=eager_loading, **kwargs
+        )
+
+    def get_project_names(self) -> List[str]:
+        """
+        Returns all project names in DB
+        :return: List of project names
+        """
+        project_names = list()
+        for project in self.projects.distinct("project_name"):
+            project_names.append(project["project_name"])
+        return project_names
+
+
+if __name__ == "__main__":
+    db = Database()
