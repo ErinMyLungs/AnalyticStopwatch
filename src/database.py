@@ -1,11 +1,10 @@
 """ Contains database mixin class """
-from typing import Tuple, Union, List, Generator, Any, Dict
+import json
+from pathlib import Path
+from typing import Dict, List, Tuple, Union
 
 import dataset
 from models import Entry, Project
-from pathlib import Path
-import json
-import functools
 
 
 def as_project(query):

@@ -1,11 +1,11 @@
 """ GUI module, contains BaseGUI class and PyTogglGUI subclass """
 import datetime
-from typing import Tuple, Optional, Union
+from typing import Optional, Tuple, Union
 
 import dearpygui.core as c
 import dearpygui.simple as s
-from dev_gui import start_development_windows
 from database import Database
+from dev_gui import start_development_windows
 from models import Entry, Project
 
 
@@ -84,7 +84,7 @@ class BaseGUI:
         """
         A minimum run function would be c.start_dearpygui()
         """
-        raise NotImplemented
+        raise NotImplementedError
 
 
 class PyTogglGUI(BaseGUI):
@@ -108,7 +108,8 @@ class PyTogglGUI(BaseGUI):
         self.db = Database(development=self.development)
         self.initialize_tracking_data()
 
-    def initialize_tracking_data(self):
+    @staticmethod
+    def initialize_tracking_data():
         """
         Initializes data objects tracking and start_time
         """
@@ -136,6 +137,10 @@ class PyTogglGUI(BaseGUI):
 
     @property
     def start_time(self) -> datetime.datetime:
+        """
+        Property for start_time stored in DearPyGUI
+        :return:  datetime of prior start_time
+        """
         # noinspection PyTypeChecker
         return c.get_data("start_time")
 
@@ -197,14 +202,11 @@ class PyTogglGUI(BaseGUI):
 
         if return_value is True:
             return updated_entry
-        else:
-            return
 
     def save_new_project(self, *args):
         """
-        Fetches data from the create new project window and inserts into db and then refreshes the combo dropdown values
-        :param args:
-        :return:
+        Fetches data from the create new project window and inserts into db and then refreshes the
+        combo dropdown values
         """
         project_data = dict()
         for val in Project.__annotations__:
@@ -256,7 +258,7 @@ class PyTogglGUI(BaseGUI):
             no_title_bar=True,
             no_resize=not self.development,
             no_move=not self.development,
-            **kwargs
+            **kwargs,
         ):
             c.set_value(
                 "timer_text",
@@ -264,14 +266,11 @@ class PyTogglGUI(BaseGUI):
             )
             c.add_text(name="TimerText", source="timer_text")
             c.add_button(name="Start Timer", callback=self.flip_timer_state)
-            c.add_combo(
-                name="Project", items=self.db.get_project_names()
-            )
+            c.add_combo(name="Project", items=self.db.get_project_names())
             c.add_same_line()
             c.add_button(name="Add Project", callback=self.create_new_project)
         c.set_render_callback(self.render)
         c.start_dearpygui()
-
 
 
 if __name__ == "__main__":

@@ -1,11 +1,15 @@
 """ database models used in database.py """
 import datetime
-from dataclasses import dataclass, asdict
+from dataclasses import asdict, dataclass
 from typing import Optional
 
 
 @dataclass
 class ModelHelperMixin:
+    """
+    A simple helper class that defines ID and the to_dict method for inserting into DB
+    """
+
     id: Optional[int]
 
     def to_dict(self):
@@ -29,8 +33,14 @@ class Entry(ModelHelperMixin):
     :parameter start_time: start time in datetime format
     :parameter end_time: end_time, default is creation time
     """
+
     @property
     def duration(self):
+        """
+        Calculates time delta of entry
+        :return: Duration of timed entry
+        :type return: datetime.timedelta
+        """
         return self.end_time - self.start_time
 
     project: str
@@ -40,13 +50,12 @@ class Entry(ModelHelperMixin):
     _duration = duration
 
 
-
-
 @dataclass
 class Project(ModelHelperMixin):
     """
     Defines a simple projects dataclass
     """
+
     weekly_hour_allotment: int
     monthly_frequency: int
     rate: int
