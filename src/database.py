@@ -43,9 +43,16 @@ class Database:
         :param development: Flag that wipes and re-inits the database
         :type development: bool
         """
-        self._db_uri = f"sqlite://{db_uri}" if db_uri.find("sqlite://") else db_uri
-        self.db: dataset.database.Database = dataset.connect(self._db_uri)
         self.development = development
+        if development is True:
+            self._db_uri = f"sqlite:///data/development.db"
+        else:
+            self._db_uri = f"sqlite://{db_uri}" if db_uri.find("sqlite://") else db_uri
+            # clear db_path
+            for db_path in Path().glob('**/development.db*'):
+                db_path.unlink()
+
+        self.db: dataset.database.Database = dataset.connect(self._db_uri)
         self.projects, self.entries = self.init_db()
 
     def init_db(self) -> Tuple[dataset.table.Table, dataset.table.Table]:
@@ -53,11 +60,6 @@ class Database:
         Initializes the database and creates the tables if they don't exist.
         :return: returns the projects and entry tables
         """
-        if self.development is True:
-            """ Wipes DB before recreating for development """
-            for file in Path().glob("**/timer.db*"):
-                file.unlink()
-
         tables = self.db.tables
 
         seed_db = False
@@ -133,12 +135,21 @@ class Database:
         else:
             return query_result
 
-    @as_project
     def get_all_projects(self, eager_loading: bool = False):
-        return self._eager_loader(self.get_multi_projects, eager_loading=eager_loading)
+        """
+        Gets all projects in the projects table
+        :param eager_loading: on True loads all projects into a list
+        :return: Generator or List of Projects
+        """
+        return self.get_multi_projects(eager_loading=eager_loading)
 
     @as_project
     def _get_multi_projects(self, **kwargs):
+        """
+        Internal method for calling .find with kwargs
+        :param kwargs: Column names to match on
+        :return: Results processed into a list or single entity
+        """
         return self.projects.find(**kwargs)
 
     def get_multi_projects(self, eager_loading: bool = False, **kwargs):
