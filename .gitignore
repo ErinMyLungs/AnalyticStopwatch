@@ -14,6 +14,7 @@ env
 venv
 ## Database ignores
 src/data/timer.db
+src/data/development.db
 src/data/project_data.json
 *.db-shm
 *.db-wal
