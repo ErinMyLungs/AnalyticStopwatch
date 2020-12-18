@@ -11,22 +11,22 @@ def debug_get_window_pos(sender, data):
     Debug setup for getting location configs of windows
     """
     log_info(sender, logger=data)
-    window_name = get_value("Window Name##input")
+    window_name_to_search = get_value("Window Name##input")
     show_invisible = get_value("Print invisible")
-    log_info(window_name, logger=data)
+    log_info(window_name_to_search, logger=data)
     log_info(show_invisible, logger=data)
     window_list = list()
 
-    if window_name:
-        log_debug(window_name, logger=data)
-        for window in get_windows():
-            if window_name.lower() in window.lower():
-                window_list.append(window)
+    if window_name_to_search:
+        log_debug(window_name_to_search, logger=data)
+        for window_name in get_windows():
+            if window_name_to_search.lower() in window_name.lower():
+                window_list.append(window_name)
     else:
         window_list = get_windows()
 
-    for window in window_list:
-        config = get_item_configuration(window)
+    for window_name in window_list:
+        config = get_item_configuration(window_name)
         if show_invisible is False:
             if config.get("show") is False:
                 continue

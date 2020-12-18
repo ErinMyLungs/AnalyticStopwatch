@@ -1,18 +1,22 @@
 """ GUI module, contains BaseGUI class and PyTogglGUI subclass """
 import datetime
-from typing import Optional, Tuple, Union
+from typing import Optional, Tuple
 
 import dearpygui.core as c
 import dearpygui.simple as s
-from database import Database
-from dev_gui import start_development_windows
-from models import Entry, Project
+from src.database import Database
+from src.dev_gui import start_development_windows
+from src.models import Entry, Project
 
 
 class BaseGUI:
+    """
+    Base GUI class with logging help functions and base screen initializations.
+    """
     def __init__(
         self,
         development: bool = False,
+        *,
         dev_window_size: Tuple[int, int] = (800, 800),
         prod_window_size: Tuple[int, int] = (300, 300),
         title: str = "PyToggl",
@@ -66,18 +70,43 @@ class BaseGUI:
             log_fun(message=message, logger=self.logger)
 
     def log(self, message: str):
+        """
+        This is a short-hand for log_info. Literally calls the same thing.
+        :param message: Message to send to logger
+        :return: Message in show_logger() window
+        """
         return self.log_info(message)
 
     def log_info(self, message: str):
+        """
+        Adds message to logger in info level
+        :param message: message to log
+        :return: Message in logger
+        """
         self._log(message, log_fun=c.log_info)
 
     def log_debug(self, message: str):
+        """
+        Adds message to logger at debug level
+        :param message: message to log
+        :return: Debug message in logger
+        """
         self._log(message=message, log_fun=c.log_debug)
 
     def log_warning(self, message: str):
+        """
+        Adds message to logger at warning level
+        :param message: Message to log
+        :return: Warning message in logger
+        """
         self._log(message=message, log_fun=c.log_warning)
 
     def log_error(self, message: str):
+        """
+        Adds error message to logger. Does not raise error
+        :param message: Message to log
+        :return: Error message in logger
+        """
         self._log(message=message, log_fun=c.log_error)
 
     def run(self):
@@ -88,10 +117,11 @@ class BaseGUI:
 
 
 class PyTogglGUI(BaseGUI):
+    """
+    Stopwatch class, builds out the GUI portion of PyToggl
+    """
     def __init__(self, **kwargs):
         """
-        Stopwatch class, builds out the GUI portion of PyToggl
-
         :keyword development: If True launches logger + debugger
         :type development: bool
         :keyword dev_window_size: Dev window size, typically larger to accommodate dev tools
@@ -144,7 +174,8 @@ class PyTogglGUI(BaseGUI):
         # noinspection PyTypeChecker
         return c.get_data("start_time")
 
-    def set_start_time(self, manual_time: Optional[datetime.datetime] = None):
+    @staticmethod
+    def set_start_time(manual_time: Optional[datetime.datetime] = None):
         """
         Sets start_time property to either now or a manual entry
         :param manual_time: datetime object manual setting
@@ -164,10 +195,15 @@ class PyTogglGUI(BaseGUI):
         return datetime.datetime.now() - self.start_time
 
     @property
-    def project(self):
+    def project(self) -> str:
+        """
+        Gets selected project from dropdown
+
+        :return: Selected project_name
+        """
         return c.get_value("Project")
 
-    def flip_timer_state(self, *args):
+    def flip_timer_state(self, *_args):
         """
         Flips tracking bool, sets starting time, and flips button label
         :arg sender: Callback widget name in pos 0
@@ -184,7 +220,7 @@ class PyTogglGUI(BaseGUI):
         self.set_tracking()
         self.set_start_time()
 
-    def save_new_entry(self, return_value: bool = False) -> Union[None, Entry]:
+    def save_new_entry(self) -> None:
         """
         Inserts timer entry to entries table
         :param return_value: Option to return the created entry
@@ -193,29 +229,29 @@ class PyTogglGUI(BaseGUI):
         """
         entry_to_insert = Entry(
             id=None,
-            project=self.project,
+            project_name=self.project,
             description="",
             start_time=self.start_time,
             end_time=datetime.datetime.now(),
         )
-        updated_entry = self.db.add_entry(entry_to_insert, return_value=return_value)
+        self.db.add_entry(entry_to_insert)
 
-        if return_value is True:
-            return updated_entry
 
-    def save_new_project(self, *args):
+
+    def save_new_project(self, *_args):
         """
         Fetches data from the create new project window and inserts into db and then refreshes the
         combo dropdown values
         """
         project_data = dict()
+        #pylint: disable=no-member
         for val in Project.__annotations__:
             project_data[val] = c.get_value(f"{val}##new_project")
         self.db.add_project(project_data)
         c.configure_item("Project", items=self.db.get_project_names())
         c.delete_item("Create New Project")
 
-    def create_new_project(self, *args):
+    def create_new_project(self, *_args):
         """
         Defines a simple window that takes inputs for creating a new project
         :return: On save inserts project data into database
@@ -228,7 +264,7 @@ class PyTogglGUI(BaseGUI):
             c.add_input_int("weekly_hour_allotment##new_project")
             c.add_button("Save##SaveProject", callback=self.save_new_project)
 
-    def render(self, *args):
+    def render(self, *_args):
         """
         Updates timer text continuously
         """
@@ -241,6 +277,7 @@ class PyTogglGUI(BaseGUI):
             )
 
     def run(self, width: int = 300, height: int = 300, **kwargs):
+        #pylint: disable=arguments-differ
         """
         GUI definition and runs dearpygui
         :param width: pixel width of main window

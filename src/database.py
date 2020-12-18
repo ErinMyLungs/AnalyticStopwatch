@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import Dict, List, Tuple, Union
 
 import dataset
-from models import Entry, Project
+from src.models import Entry, Project
 
 
 def as_project(query):
@@ -34,6 +34,10 @@ def as_entry(query):
 
 
 class Database:
+    """
+    This class structures the database with initialization, access and insert methods
+    """
+
     def __init__(
         self, db_uri: str = "sqlite:///data/timer.db", development: bool = False
     ):
@@ -45,11 +49,11 @@ class Database:
         """
         self.development = development
         if development is True:
-            self._db_uri = f"sqlite:///data/development.db"
+            self._db_uri = "sqlite:///data/development.db"
         else:
             self._db_uri = f"sqlite://{db_uri}" if db_uri.find("sqlite://") else db_uri
             # clear db_path
-            for db_path in Path().glob('**/development.db*'):
+            for db_path in Path().glob("**/development.db*"):
                 db_path.unlink()
 
         self.db: dataset.database.Database = dataset.connect(self._db_uri)
@@ -78,8 +82,8 @@ class Database:
         # Pre-seeding the project database. See example_project_data.json for example values
         project_starter_data_path = Path("./data/project_data.json")
         if project_starter_data_path.exists():
-            with project_starter_data_path.open() as f:
-                project_starter_data = json.load(f)
+            with project_starter_data_path.open() as file:
+                project_starter_data = json.load(file)
 
             for project in project_starter_data:
                 projects_table.insert(project)
@@ -98,8 +102,7 @@ class Database:
         inserted_id = self.entries.insert(entry.to_dict())
         if not return_value:
             return inserted_id
-        else:
-            return Entry(**self.entries.find_one(id=inserted_id))
+        return Entry(**self.entries.find_one(id=inserted_id))
 
     def add_project(
         self, project: Union[Dict, Project], return_value: bool = False
@@ -119,21 +122,16 @@ class Database:
 
         if not return_value:
             return inserted_id
-        else:
-            project_in_db = self.projects.find_one(id=inserted_id)
-            return project_in_db if project_in_db else None
+
+        project_in_db = self.projects.find_one(id=inserted_id)
+        return project_in_db if project_in_db else None
 
     @staticmethod
     def _eager_loader(query: callable, eager_loading: bool, **kwargs):
         query_result = query(**kwargs)
         if eager_loading:
-            query_result = list(query_result)
-            if len(query_result) == 1:
-                return query_result[0]
-            else:
-                return query_result
-        else:
-            return query_result
+            return list(query_result)
+        return query_result
 
     def get_all_projects(self, eager_loading: bool = False):
         """
@@ -165,12 +163,27 @@ class Database:
 
     @as_entry
     def _get_multi_entries(self, **kwargs):
+        """
+        Internal query of get entries with decorator to auto-convert to entry dataclass
+        :return: Dataset result iterator -> generator that unpacks results into entries.
+        """
         return self.entries.find(**kwargs)
 
     def get_all_entries(self, eager_loading: bool = False):
+        """
+        Fetches all entries in database. Essentially calling get_multi_entries with no kwargs
+        :param eager_loading: if True load everything into a list in memory
+        :return: Generator or List of entries
+        """
         return self._eager_loader(self._get_multi_entries, eager_loading=eager_loading)
 
     def get_multi_entries(self, eager_loading: bool = False, **kwargs):
+        """
+        Get all timer entries matching kwargs passed in.
+        :param eager_loading: On True returns a list else returns a generator
+        :param kwargs: id, project, description are likely candidates for searching
+        :return: Generator or List of Entries
+        """
         return self._eager_loader(
             self._get_multi_entries, eager_loading=eager_loading, **kwargs
         )
@@ -187,4 +200,4 @@ class Database:
 
 
 if __name__ == "__main__":
-    db = Database()
+    db = Database(development=True)

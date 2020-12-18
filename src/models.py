@@ -9,7 +9,6 @@ class ModelHelperMixin:
     """
     A simple helper class that defines ID and the to_dict method for inserting into DB
     """
-
     id: Optional[int]
 
     def to_dict(self):
@@ -43,7 +42,7 @@ class Entry(ModelHelperMixin):
         """
         return self.end_time - self.start_time
 
-    project: str
+    project_name: str
     description: str
     start_time: datetime.datetime
     end_time: datetime.datetime
