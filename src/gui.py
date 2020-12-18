@@ -106,7 +106,6 @@ class PyTogglGUI(BaseGUI):
         super().__init__(**kwargs)
 
         self.db = Database(development=self.development)
-        self.projects = self.db.get_project_names()
         self.initialize_tracking_data()
 
     def initialize_tracking_data(self):
@@ -201,6 +200,32 @@ class PyTogglGUI(BaseGUI):
         else:
             return
 
+    def save_new_project(self, *args):
+        """
+        Fetches data from the create new project window and inserts into db and then refreshes the combo dropdown values
+        :param args:
+        :return:
+        """
+        project_data = dict()
+        for val in Project.__annotations__:
+            project_data[val] = c.get_value(f"{val}##new_project")
+        self.db.add_project(project_data)
+        c.configure_item("Project", items=self.db.get_project_names())
+        c.delete_item("Create New Project")
+
+    def create_new_project(self, *args):
+        """
+        Defines a simple window that takes inputs for creating a new project
+        :return: On save inserts project data into database
+        """
+        with s.window("Create New Project"):
+            c.add_input_text("project_name##new_project")
+            c.add_input_text("client##new_project")
+            c.add_input_int("rate##new_project")
+            c.add_input_int("monthly_frequency##new_project")
+            c.add_input_int("weekly_hour_allotment##new_project")
+            c.add_button("Save##SaveProject", callback=self.save_new_project)
+
     def render(self, *args):
         """
         Updates timer text continuously
@@ -240,10 +265,13 @@ class PyTogglGUI(BaseGUI):
             c.add_text(name="TimerText", source="timer_text")
             c.add_button(name="Start Timer", callback=self.flip_timer_state)
             c.add_combo(
-                name="Project", items=self.projects
+                name="Project", items=self.db.get_project_names()
             )
+            c.add_same_line()
+            c.add_button(name="Add Project", callback=self.create_new_project)
         c.set_render_callback(self.render)
         c.start_dearpygui()
+
 
 
 if __name__ == "__main__":
