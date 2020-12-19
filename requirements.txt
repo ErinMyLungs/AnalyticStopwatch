@@ -5,4 +5,4 @@ isort
 pylint
 pytest
 pytest-cov
-hypothesis
+hypothesis[cli]

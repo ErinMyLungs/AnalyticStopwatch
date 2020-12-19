@@ -1,5 +1,6 @@
 """ Contains database mixin class """
 import json
+import struct
 from pathlib import Path
 from typing import Dict, List, Tuple, Union
 
@@ -50,11 +51,13 @@ class Database:
         self.development = development
         if development is True:
             self._db_uri = "sqlite:///data/development.db"
+            # clear db_path
+
+            for db_path in Path(".").glob("**/development.db*"):
+                db_path.unlink()
+
         else:
             self._db_uri = f"sqlite://{db_uri}" if db_uri.find("sqlite://") else db_uri
-            # clear db_path
-            for db_path in Path().glob("**/development.db*"):
-                db_path.unlink()
 
         self.db: dataset.database.Database = dataset.connect(self._db_uri)
         self.projects, self.entries = self.init_db()
@@ -66,17 +69,10 @@ class Database:
         """
         tables = self.db.tables
 
-        seed_db = False
-
-        for table_name in ["entries", "projects"]:
-            if table_name not in tables:
-                seed_db = table_name == "projects"  # pre-seed if new
-                self.db.create_table(table_name=table_name)
-
-        projects_table: dataset.table.Table = self.db.get_table("projects")
+        projects_table = self.db.get_table("projects")
         entries_table = self.db.get_table("entries")
 
-        if not seed_db:
+        if self.development is False:
             return projects_table, entries_table
 
         # Pre-seeding the project database. See example_project_data.json for example values
@@ -117,6 +113,17 @@ class Database:
         """
         if isinstance(project, Project):
             project = project.to_dict()
+        if project.get("id", False) is not None:
+            project["id"] = None
+
+        for key, type_annotation in Project.__annotations__.items():
+            if (type_annotation == int) and (key != "id"):
+                try:
+                    struct.pack("q", project.get(key))
+                except struct.error as int_error:
+                    raise ValueError(
+                        f"{key} value {project.get(key)} needs to be a valid int type"
+                    ) from int_error
 
         inserted_id = self.projects.insert(project)
 

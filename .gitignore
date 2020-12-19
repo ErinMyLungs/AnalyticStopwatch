@@ -18,3 +18,4 @@ src/data/development.db
 src/data/project_data.json
 *.db-shm
 *.db-wal
+.hypothesis
