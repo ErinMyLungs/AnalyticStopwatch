@@ -1,6 +1,8 @@
+dataset
 dearpygui
+pandas
+isort
 pylint
 pytest
-isort
-pandas
-dataset
+pytest-cov
+hypothesis
