@@ -13,6 +13,7 @@ class BaseGUI:
     """
     Base GUI class with logging help functions and base screen initializations.
     """
+
     def __init__(
         self,
         development: bool = False,
@@ -120,6 +121,7 @@ class PyTogglGUI(BaseGUI):
     """
     Stopwatch class, builds out the GUI portion of PyToggl
     """
+
     def __init__(self, **kwargs):
         """
         :keyword development: If True launches logger + debugger
@@ -236,15 +238,13 @@ class PyTogglGUI(BaseGUI):
         )
         self.db.add_entry(entry_to_insert)
 
-
-
     def save_new_project(self, *_args):
         """
         Fetches data from the create new project window and inserts into db and then refreshes the
         combo dropdown values
         """
         project_data = dict()
-        #pylint: disable=no-member
+        # pylint: disable=no-member
         for val in Project.__annotations__:
             project_data[val] = c.get_value(f"{val}##new_project")
         self.db.add_project(project_data)
@@ -277,7 +277,7 @@ class PyTogglGUI(BaseGUI):
             )
 
     def run(self, width: int = 300, height: int = 300, **kwargs):
-        #pylint: disable=arguments-differ
+        # pylint: disable=arguments-differ
         """
         GUI definition and runs dearpygui
         :param width: pixel width of main window
