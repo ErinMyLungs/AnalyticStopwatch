@@ -13,7 +13,7 @@ The end-goal is a local, open-source timer that is hackable and can automate spe
 ![Development View](./repo_resources/development_mode.png)
 
 ## Current Next Steps:
-* Integrate sqlite DB of timer sessions
+~~* Integrate sqlite DB of timer sessions~~
 * Add inputs for specific task descriptions (text box)
 * Add inputs for tags
 * Add report CSV output
@@ -42,3 +42,30 @@ Creating the GUI can be as simple as:
 gui = PyTogglGUI(development=False, db_uri="sqlite_filepath")
 gui.run()
 ```
+
+### database.py
+Contains Database class that handles initialization and helper methods for accessing local sqlite db.
+
+### models.py
+Contains dataclasses for:
+* Entry
+* Project
+
+Also contains a base class with helper methods used in the above.
+
+#### ModelHelperMixin
+There are 2 simple methods and 2 rather fancy methods implemented:
+
+simple helpers are:
+* `to_dict` which is convenience for calling asdict on the dataclass
+* `get` which uses the getattr on self but with no default
+
+Some base validation has been created on attributes with:
+* `__post_init__`
+* `_check_if_annotation_matches`
+ 
+`__post_init_` Validates that all attributes match their type annotation and that all integers can be converted to a sqlite valid integer. Thank you Hypothesis for pointing this out although if I'm ever making a rate of more than 9223372036854775807 on a project then I might have to upgrade the database.
+
+### AnalyticalStopwatch/src/tests
+
+Use of hypothesis testing and pytest. Quite exciting!
