@@ -4,6 +4,7 @@ from typing import Optional, Tuple
 
 import dearpygui.core as c
 import dearpygui.simple as s
+
 from src.database import Database
 from src.dev_gui import start_development_windows
 from src.models import Entry, Project
@@ -247,7 +248,7 @@ class PyTogglGUI(BaseGUI):
         # pylint: disable=no-member
         for val in Project.__annotations__:
             project_data[val] = c.get_value(f"{val}##new_project")
-        self.db.add_project(project_data)
+        self.db.add_project(Project(**project_data, id=None))
         c.configure_item("Project", items=self.db.get_project_names())
         c.delete_item("Create New Project")
 

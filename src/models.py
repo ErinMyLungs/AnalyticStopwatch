@@ -1,7 +1,9 @@
 """ database models used in database.py """
 import datetime
+import inspect
+import struct
 from dataclasses import asdict, dataclass
-from typing import Optional
+from typing import Generator, Optional
 
 
 @dataclass
@@ -22,6 +24,72 @@ class ModelHelperMixin:
             class_dict.pop("id")
 
         return class_dict
+
+    def get(self, attribute: str):
+        """
+        Simple wrap around getattr to mirror dictionary .get accessing
+        :param attribute: Attribute name as a str to get
+        :return: Attribute value
+        """
+        return getattr(self, attribute)
+
+    def _check_if_annotation_matches(self) -> Generator:
+        """
+        Basic generator to iterate through attributes and check for match.
+
+        This is so if overriding __post_init__ with class specific validation it'll be more modular
+        :return: generator of attribute_name, type_annotation, and if the attribute value matches
+        """
+        for attribute_name, type_annotation in inspect.getfullargspec(
+            self.__class__
+        ).annotations.items():
+            if attribute_name in {"return", "id"}:
+                continue
+            yield attribute_name, type_annotation, isinstance(
+                self.get(attribute_name), type_annotation
+            )
+
+    def __post_init__(self):
+        """
+        Validates that all attributes except ID match their type annotation
+        :return: None or raises error with count, list, and info about attribute problems
+        """
+
+        create_type_error_str = lambda attr, type_anno: (
+            f"\tAttribute {attr} must match type {type_anno}"
+            f"\n\t\tReceived: {self.get(attr)} of type {type(self.get(attr))} type!"
+        )
+        create_int8_error_str = lambda attr, int8error: (
+            f"\t Attribute {attr} cannot be converted to int8 (value: {self.get(attr)})"
+            f"\n\t\t struct.error - {int8error.args[0]}"
+        )
+
+        attribute_fail_list = list()
+        for (
+            attribute_name,
+            type_annotation,
+            type_match_check,
+        ) in self._check_if_annotation_matches():
+            if type_match_check is False:
+                attribute_fail_list.append(
+                    create_type_error_str(attribute_name, type_annotation)
+                )
+            elif type_annotation is int:
+                try:
+                    struct.pack("q", self.get(attribute_name))
+                except struct.error as int8error:
+                    attribute_fail_list.append(
+                        create_int8_error_str(attribute_name, int8error)
+                    )
+
+        if attribute_fail_list:
+            final_error_str = "\n\n".join(
+                (
+                    f"{len(attribute_fail_list)} invalid attributes:",
+                    *attribute_fail_list,
+                )
+            )
+            raise AttributeError(final_error_str)
 
 
 @dataclass
@@ -53,7 +121,8 @@ class Entry(ModelHelperMixin):
 @dataclass
 class Project(ModelHelperMixin):
     """
-    Defines a simple projects dataclass
+    Defines a simple projects dataclass, has attributes -
+    id, project_name, client, rate, monthly_frequency, weekly_hour_allotment
     """
 
     weekly_hour_allotment: int

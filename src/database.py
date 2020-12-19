@@ -1,6 +1,5 @@
 """ Contains database mixin class """
 import json
-import struct
 from pathlib import Path
 from typing import Dict, List, Tuple, Union
 
@@ -94,36 +93,33 @@ class Database:
         :type return_value: bool
         :return: created ID or entry if return_value is True
         """
-        inserted_id = self.entries.insert(entry.to_dict())
+        if isinstance(entry, Entry):
+            entry: Dict = entry.to_dict()
+        else:
+            raise ValueError(f"Entry must be an Entry dataclass, not {type(entry)}")
+        inserted_id = self.entries.insert(entry)
         if not return_value:
             return inserted_id
-        return Entry(**self.entries.find_one(id=inserted_id))
+        entry_in_db = self.entries.find_one(id=inserted_id)
+        return Entry(**entry_in_db) if entry_in_db else None
 
     def add_project(
-        self, project: Union[Dict, Project], return_value: bool = False
+        self, project: Project, return_value: bool = False
     ) -> Union[int, Project]:
         """
         Insert project into project table
         :param project: Project dataclass to insert
-        :type project: Dict or Project dataclass
+        :type project: Project dataclass
         :param return_value: If True return updated Project
         :type return_value: bool
         :return: db ID or Project if return_value is True
         """
         if isinstance(project, Project):
-            project = project.to_dict()
-        if project.get("id", False) is not None:
-            project["id"] = None
-
-        # pylint: disable=no-member
-        for key, type_annotation in Project.__annotations__.items():
-            if (type_annotation == int) and (key != "id"):
-                try:
-                    struct.pack("q", project.get(key))
-                except struct.error as int_error:
-                    raise ValueError(
-                        f"{key} value {project.get(key)} needs to be a valid int type"
-                    ) from int_error
+            project: Dict = project.to_dict()
+        else:
+            raise ValueError(
+                f"Project must be a Project dataclass, not {type(project)}"
+            )
 
         inserted_id = self.projects.insert(project)
 
@@ -131,7 +127,7 @@ class Database:
             return inserted_id
 
         project_in_db = self.projects.find_one(id=inserted_id)
-        return project_in_db if project_in_db else None
+        return Project(**project_in_db) if project_in_db else None
 
     @staticmethod
     def _eager_loader(query: callable, eager_loading: bool, **kwargs):
@@ -157,7 +153,9 @@ class Database:
         """
         return self.projects.find(**kwargs)
 
-    def get_multi_projects(self, eager_loading: bool = False, **kwargs):
+    def get_multi_projects(
+        self, eager_loading: bool = False, **kwargs
+    ) -> List[Project]:
         """
         Returns project query fetched matching kwarg values
         :param eager_loading: if True returns value in memory, else generator
