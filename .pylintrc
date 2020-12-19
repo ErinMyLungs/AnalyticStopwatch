@@ -10,7 +10,8 @@ fail-under=9.75
 
 # Add files or directories to the blacklist. They should be base names, not
 # paths.
-ignore=CVS
+# Adding ignore for tests. Minor linting will happen but not to the extent of the regular code.
+ignore=CVS, tests
 
 # Add files or directories matching the regex patterns to the blacklist. The
 # regex matches against base names, not paths.
@@ -443,7 +444,7 @@ good-names=i,
 good-names-rgxs=
 
 # Include a hint for the correct naming format with invalid-name.
-include-naming-hint=no
+include-naming-hint=yes
 
 # Naming style matching correct inline iteration names.
 inlinevar-naming-style=any

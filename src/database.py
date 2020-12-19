@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import Dict, List, Tuple, Union
 
 import dataset
+
 from src.models import Entry, Project
 
 
@@ -67,8 +68,6 @@ class Database:
         Initializes the database and creates the tables if they don't exist.
         :return: returns the projects and entry tables
         """
-        tables = self.db.tables
-
         projects_table = self.db.get_table("projects")
         entries_table = self.db.get_table("entries")
 
@@ -116,6 +115,7 @@ class Database:
         if project.get("id", False) is not None:
             project["id"] = None
 
+        # pylint: disable=no-member
         for key, type_annotation in Project.__annotations__.items():
             if (type_annotation == int) and (key != "id"):
                 try:
