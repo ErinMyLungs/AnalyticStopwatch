@@ -4,7 +4,6 @@ from pathlib import Path
 from typing import Dict, List, Tuple, Union
 
 import dataset
-
 from src.models import Entry, Project
 
 
@@ -101,7 +100,7 @@ class Database:
         if not return_value:
             return inserted_id
         entry_in_db = self.entries.find_one(id=inserted_id)
-        return Entry(**entry_in_db) if entry_in_db else None
+        return Entry(**entry_in_db)
 
     def add_project(
         self, project: Project, return_value: bool = False
@@ -127,7 +126,7 @@ class Database:
             return inserted_id
 
         project_in_db = self.projects.find_one(id=inserted_id)
-        return Project(**project_in_db) if project_in_db else None
+        return Project(**project_in_db)
 
     @staticmethod
     def _eager_loader(query: callable, eager_loading: bool, **kwargs):

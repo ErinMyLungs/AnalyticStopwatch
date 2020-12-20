@@ -2,36 +2,11 @@
 import datetime
 
 import pytest
-from hypothesis import assume, given
-from hypothesis.strategies import (
-    builds,
-    composite,
-    data,
-    datetimes,
-    integers,
-    none,
-    text,
-)
+from tests.utils import entry_build_strategy, project_build_strategy
 
+from hypothesis import assume, given
 from src.database import Database
 from src.models import Entry, Project
-
-INT8_RANGE = dict(min_value=-9223372036854775807, max_value=9223372036854775807)
-PROJECT_HYPOTHESIS = dict(
-    id=none(),
-    rate=integers(**INT8_RANGE),
-    monthly_frequency=integers(**INT8_RANGE),
-    weekly_hour_allotment=integers(**INT8_RANGE),
-)
-ENTRY_HYPOTHESIS = {
-    "id": none(),
-    "project_name": text(),
-    "description": text(),
-    "start_time": datetimes(),
-    "end_time": datetimes(),
-}
-project_build_strategy = builds(Project, **PROJECT_HYPOTHESIS)
-entry_build_strategy = builds(Entry, **ENTRY_HYPOTHESIS)
 
 
 @pytest.fixture(scope="module")
@@ -49,6 +24,11 @@ def test_intialization(db):
     assert db.entries == db.db.get_table("entries")
     assert db.db.get_table("projects").count() == 3
     assert db.db.get_table("entries").count() == 0
+
+
+def test_production_flag():
+    db = Database()
+    assert db._db_uri != "sqlite:///data/development.db"
 
 
 def test_get_project_names(db):
@@ -134,6 +114,20 @@ def test_add_wrong_type_project(db):
         error_message = f"Project must be a Project dataclass, not {type(bad_data)}"
         with pytest.raises(ValueError, match=error_message):
             db.add_project(bad_data)
+
+
+@given(project=project_build_strategy)
+def test_insert_return_value(db, project):
+    project_output: Project = db.add_project(project, return_value=True)
+
+    assert isinstance(project_output, Project)
+
+    assert project.id != project_output.id
+
+    for key, value in project.to_dict().items():
+        if key == "id":
+            continue
+        assert project_output.get(key) == value
 
 
 @given(entry=entry_build_strategy)
