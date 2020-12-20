@@ -222,7 +222,6 @@ class PyTogglGUI(BaseGUI):
         if self.tracking:
             label = "Start Timer"
             self.save_new_entry()
-
         else:
             label = "End Timer"
 
@@ -244,7 +243,8 @@ class PyTogglGUI(BaseGUI):
             start_time=self.start_time,
             end_time=datetime.datetime.now(),
         )
-        self.db.add_entry(entry_to_insert)
+        entry = self.db.add_entry(entry_to_insert, return_value=True)
+        self.add_row_to_entry_table(entry)
 
     def save_new_project(self, *_args):
         """
@@ -271,6 +271,35 @@ class PyTogglGUI(BaseGUI):
             c.add_input_int("monthly_frequency##new_project")
             c.add_input_int("weekly_hour_allotment##new_project")
             c.add_button("Save##SaveProject", callback=self.save_new_project)
+
+    @staticmethod
+    def add_row_to_entry_table(entry: Entry) -> None:
+        """
+        Helper to add entry to the table
+        :param entry: A single entry to convert to entries table
+        :return: New row attached to the Entries##table
+        """
+        row_data = [
+            entry.project_name,
+            entry.description,
+            str(entry.duration)[:10],
+            entry.start_time.time().strftime("%I:%M"),
+            entry.end_time.time().strftime("%I:%M"),
+        ]
+        c.add_row("Entries##table", row_data)
+
+    def entries_table(self):
+        """
+        Creates entries table and fills with all entries
+        :return: Entry table?
+        """
+
+        c.add_table(
+            "Entries##table",
+            headers=["Project", "Description", "Duration", "Start", "End"],
+        )
+        for entry in self.db.get_all_entries():
+            self.add_row_to_entry_table(entry)
 
     def render(self, *_args):
         """
@@ -318,6 +347,9 @@ class PyTogglGUI(BaseGUI):
             c.add_same_line()
             c.add_button(name="Add Project", callback=self.create_new_project)
             c.add_same_line()
+
+            c.add_spacing()
+            self.entries_table()
 
         c.set_render_callback(self.render)
         c.start_dearpygui()
