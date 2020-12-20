@@ -50,7 +50,8 @@ def test_fuzz_Entry(id, project_name, description, start_time, end_time):
 
 @given(id=st.one_of(st.none(), st.integers()))
 def test_fuzz_ModelHelperMixin(id):
-    models.ModelHelperMixin(id=id)
+    result_model = models.BaseModelClass(id=id)
+    assert result_model.id == id
 
 
 @given(

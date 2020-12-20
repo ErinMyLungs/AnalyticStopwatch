@@ -7,7 +7,7 @@ from typing import Generator, Optional
 
 
 @dataclass
-class ModelHelperMixin:
+class BaseModelClass:
     """
     A simple helper class that defines ID and the to_dict method for inserting into DB
     """
@@ -22,7 +22,6 @@ class ModelHelperMixin:
         class_dict = asdict(self)
         if self.id is None:
             class_dict.pop("id")
-
         return class_dict
 
     def get(self, attribute: str):
@@ -93,7 +92,7 @@ class ModelHelperMixin:
 
 
 @dataclass
-class Entry(ModelHelperMixin):
+class Entry(BaseModelClass):
     """
     Defines a simple entry dataclass for db handling
     :parameter project: Project name
@@ -119,7 +118,7 @@ class Entry(ModelHelperMixin):
 
 
 @dataclass
-class Project(ModelHelperMixin):
+class Project(BaseModelClass):
     """
     Defines a simple projects dataclass, has attributes -
     id, project_name, client, rate, monthly_frequency, weekly_hour_allotment
