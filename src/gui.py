@@ -4,7 +4,6 @@ from typing import Optional, Tuple
 
 import dearpygui.core as c
 import dearpygui.simple as s
-
 from src.database import Database
 from src.dev_gui import start_development_windows
 from src.models import Entry, Project
@@ -206,6 +205,14 @@ class PyTogglGUI(BaseGUI):
         """
         return c.get_value("Project")
 
+    @property
+    def description(self) -> str:
+        """
+        Property for description input value
+        :return: Str description of task
+        """
+        return c.get_value("Description")
+
     def flip_timer_state(self, *_args):
         """
         Flips tracking bool, sets starting time, and flips button label
@@ -233,7 +240,7 @@ class PyTogglGUI(BaseGUI):
         entry_to_insert = Entry(
             id=None,
             project_name=self.project,
-            description="",
+            description=self.description,
             start_time=self.start_time,
             end_time=datetime.datetime.now(),
         )
@@ -277,7 +284,7 @@ class PyTogglGUI(BaseGUI):
                 datetime.time.strftime(datetime.datetime.now().time(), "%H:%M:%S"),
             )
 
-    def run(self, width: int = 300, height: int = 300, **kwargs):
+    def run(self, width: int = 600, height: int = 600, **kwargs):
         # pylint: disable=arguments-differ
         """
         GUI definition and runs dearpygui
@@ -303,10 +310,15 @@ class PyTogglGUI(BaseGUI):
                 datetime.time.strftime(datetime.datetime.now().time(), "%H:%M:%S"),
             )
             c.add_text(name="TimerText", source="timer_text")
+            c.add_combo(name="Project", items=self.db.get_project_names(), width=200)
+            c.add_input_text(
+                name="Description", default_value="coding", label="Description"
+            )
             c.add_button(name="Start Timer", callback=self.flip_timer_state)
-            c.add_combo(name="Project", items=self.db.get_project_names())
             c.add_same_line()
             c.add_button(name="Add Project", callback=self.create_new_project)
+            c.add_same_line()
+
         c.set_render_callback(self.render)
         c.start_dearpygui()
 

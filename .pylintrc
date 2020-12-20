@@ -15,7 +15,7 @@ ignore=tests
 
 # Add files or directories matching the regex patterns to the blacklist. The
 # regex matches against base names, not paths.
-ignore-patterns=*/tests/*.py
+ignore-patterns=
 
 # Python code to execute, usually for sys.path manipulation such as
 # pygtk.require().
