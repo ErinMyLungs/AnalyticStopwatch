@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import Dict, List, Tuple, Union
 
 import dataset
+
 from src.models import Entry, Project
 
 
@@ -73,22 +74,35 @@ class Database:
         if self.development is False:
             return projects_table, entries_table
 
-        # Pre-seeding the project database. See example_project_data.json for example values
-        project_starter_data_path = Path("./data/project_data.json")
+        self._pre_seed_db()
+
+        return projects_table, entries_table
+
+    def _pre_seed_db(
+        self,
+        project_starter_data_path: Path = Path("./data/project_data.json"),
+        entries_pickle_path: Path = Path("./data/entries"),
+    ) -> None:
+        """
+        Pre-seeding the database with projects and entries. Projects can be stored as json, entries
+        are stored as a pickle due to datetime not converting nicely to json.
+        :param project_starter_data_path: By default /data/project_data.json
+        :type project_starter_data_path: Path
+        :param entries_pickle_path: Default /data/entries pickle
+        :type entries_pickle_path: Path
+        :return: None but database is seeded with data.
+        """
         if project_starter_data_path.exists():
             with project_starter_data_path.open() as file:
                 project_starter_data = json.load(file)
 
             for project in project_starter_data:
-                projects_table.insert(project)
+                self.db["projects"].insert(project)
 
-        with Path("./data/entries").open("rb") as f:
-            entries = pickle.load(f)
+        with entries_pickle_path.open("rb") as file:
+            entries = pickle.load(file)
         for entry in entries:
-            entry["id"] = None
-            entries_table.insert(entry)
-
-        return projects_table, entries_table
+            self.db["entries"].insert(entry.to_dict())
 
     def add_entry(self, entry: Entry, return_value: bool = False) -> Union[int, Entry]:
         """

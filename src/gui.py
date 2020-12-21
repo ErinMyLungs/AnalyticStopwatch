@@ -4,9 +4,10 @@ from typing import Optional, Tuple
 
 import dearpygui.core as c
 import dearpygui.simple as s
-from gui.entry_visualization import Chart
+
 from src.database import Database
 from src.dev_gui import start_development_windows
+from src.gui.entry_visualization import Chart
 from src.models import Entry, Project
 
 
