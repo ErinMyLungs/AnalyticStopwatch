@@ -4,6 +4,7 @@ from typing import Optional, Tuple
 
 import dearpygui.core as c
 import dearpygui.simple as s
+from gui.entry_visualization import Chart
 from src.database import Database
 from src.dev_gui import start_development_windows
 from src.models import Entry, Project
@@ -138,6 +139,8 @@ class PyTogglGUI(BaseGUI):
         super().__init__(**kwargs)
 
         self.db = Database(development=self.development)
+        self.pichart = Chart()
+        self.entries = self.db.get_all_entries(True)
         self.initialize_tracking_data()
 
     @staticmethod
@@ -244,6 +247,7 @@ class PyTogglGUI(BaseGUI):
             end_time=datetime.datetime.now(),
         )
         entry = self.db.add_entry(entry_to_insert, return_value=True)
+        self.entries.append(entry)
         self.add_row_to_entry_table(entry)
 
     def save_new_project(self, *_args):
@@ -305,6 +309,25 @@ class PyTogglGUI(BaseGUI):
         """
         Updates timer text continuously
         """
+        project_dict = dict()
+        for entry in self.entries:
+            projs = project_dict.get(entry.project_name, list())
+            projs.append(entry.duration)
+            project_dict[entry.project_name] = projs
+        labels = list()
+        data = list()
+        total_duration = datetime.timedelta()
+        for key, duration in project_dict.items():
+            sub_total = datetime.timedelta()
+            for dur in duration:
+                sub_total += dur
+            project_dict[key] = sub_total
+            total_duration += sub_total
+
+        for name, durations in project_dict.items():
+            labels.append(name)
+            data.append((durations / total_duration))
+        self.pichart.update_chart(data, labels)
         if self.tracking:
             c.set_value("timer_text", str(self.time_delta))
         else:
@@ -350,6 +373,10 @@ class PyTogglGUI(BaseGUI):
 
             c.add_spacing()
             self.entries_table()
+            c.add_spacing()
+            self.pichart.task_chart(
+                data=[0.2, 0.5, 0.3], labels=self.db.get_project_names()
+            )
 
         c.set_render_callback(self.render)
         c.start_dearpygui()

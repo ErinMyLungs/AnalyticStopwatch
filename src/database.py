@@ -1,5 +1,6 @@
 """ Contains database mixin class """
 import json
+import pickle
 from pathlib import Path
 from typing import Dict, List, Tuple, Union
 
@@ -80,6 +81,12 @@ class Database:
 
             for project in project_starter_data:
                 projects_table.insert(project)
+
+        with Path("./data/entries").open("rb") as f:
+            entries = pickle.load(f)
+        for entry in entries:
+            entry["id"] = None
+            entries_table.insert(entry)
 
         return projects_table, entries_table
 
