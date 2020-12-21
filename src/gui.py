@@ -34,6 +34,7 @@ class PyTogglGUI(BaseGUI):
         self.db = Database(development=self.development)
         self.pichart = Chart()
         self.entries = self.db.get_all_entries(True)
+        self.selected_project = None
         self.initialize_tracking_data()
 
     @staticmethod
@@ -93,15 +94,6 @@ class PyTogglGUI(BaseGUI):
         return datetime.datetime.now() - self.start_time
 
     @property
-    def project(self) -> str:
-        """
-        Gets selected project from dropdown
-
-        :return: Selected project_name
-        """
-        return c.get_value("Project")
-
-    @property
     def description(self) -> str:
         """
         Property for description input value
@@ -134,7 +126,7 @@ class PyTogglGUI(BaseGUI):
         """
         entry_to_insert = Entry(
             id=None,
-            project_name=self.project,
+            project_name=self.selected_project,
             description=self.description,
             start_time=self.start_time,
             end_time=datetime.datetime.now(),
@@ -153,7 +145,20 @@ class PyTogglGUI(BaseGUI):
         for val in Project.__annotations__:
             project_data[val] = c.get_value(f"{val}##new_project")
         self.db.add_project(Project(**project_data, id=None))
-        c.configure_item("Project", items=self.db.get_project_names())
+        c.delete_item("Projects##ProjectMenu", children_only=True)
+        for name in self.db.get_project_names():
+            c.add_menu_item(
+                name=name,
+                callback=self.select_project,
+                callback_data=name,
+                parent="Projects##ProjectMenu",
+            )
+
+        c.add_menu_item(
+            "Add project",
+            parent="Projects##ProjectMenu",
+            callback=self.create_new_project,
+        )
         c.delete_item("Create New Project")
 
     def create_new_project(self, *_args):
@@ -229,6 +234,14 @@ class PyTogglGUI(BaseGUI):
                 datetime.time.strftime(datetime.datetime.now().time(), "%H:%M:%S"),
             )
 
+    def select_project(self, sender, data):
+
+        if self.selected_project is not None:
+            c.configure_item(self.selected_project, check=False)
+        self.selected_project = data
+        c.set_main_window_title(f"{self.title} - {data}")
+        c.configure_item(data, check=True)
+
     def run(self, width: int = 700, height: int = 700, **kwargs):
         # pylint: disable=arguments-differ
         """
@@ -254,18 +267,24 @@ class PyTogglGUI(BaseGUI):
             no_move=not self.development,
             **kwargs,
         ):
+            with s.menu_bar("Main Menu Bar"):
+                with s.menu("Projects##ProjectMenu"):
+                    for name in self.db.get_project_names():
+                        c.add_menu_item(
+                            name=name,
+                            callback=self.select_project,
+                            callback_data=name,
+                        )
+                    c.add_menu_item("Add project", callback=self.create_new_project)
             c.set_value(
                 "timer_text",
                 datetime.time.strftime(datetime.datetime.now().time(), "%H:%M:%S"),
             )
             c.add_text(name="TimerText", source="timer_text")
-            c.add_combo(name="Project", items=self.db.get_project_names(), width=200)
             c.add_input_text(
                 name="Description", default_value="coding", label="Description"
             )
             c.add_button(name="Start Timer", callback=self.flip_timer_state)
-            c.add_same_line()
-            c.add_button(name="Add Project", callback=self.create_new_project)
             c.add_same_line()
 
             c.add_spacing()
