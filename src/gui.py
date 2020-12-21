@@ -229,7 +229,7 @@ class PyTogglGUI(BaseGUI):
                 datetime.time.strftime(datetime.datetime.now().time(), "%H:%M:%S"),
             )
 
-    def run(self, width: int = 600, height: int = 600, **kwargs):
+    def run(self, width: int = 700, height: int = 700, **kwargs):
         # pylint: disable=arguments-differ
         """
         GUI definition and runs dearpygui
@@ -238,9 +238,13 @@ class PyTogglGUI(BaseGUI):
         :param kwargs: any simple.window kwargs
         :return:GUI although more probably 'void'
         """
+        if self.development:
+            x_pos = 300
+        else:
+            x_pos = 0
         with s.window(
             name="Timer",
-            x_pos=0,
+            x_pos=x_pos,
             y_pos=0,
             width=width,
             height=height,

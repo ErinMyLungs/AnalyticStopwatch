@@ -15,8 +15,8 @@ class BaseGUI:
         self,
         development: bool = False,
         *,
-        dev_window_size: Tuple[int, int] = (800, 800),
-        prod_window_size: Tuple[int, int] = (300, 300),
+        dev_window_size: Tuple[int, int] = (1000, 800),
+        prod_window_size: Tuple[int, int] = (700, 700),
         title: str = "PyToggl",
         logger: str = "",
     ):
