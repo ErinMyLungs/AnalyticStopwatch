@@ -3,7 +3,7 @@ import datetime
 import inspect
 import struct
 from dataclasses import asdict, dataclass
-from typing import Generator, Optional
+from typing import Generator, Optional, Any
 
 
 @dataclass
@@ -31,6 +31,15 @@ class BaseModelClass:
         :return: Attribute value
         """
         return getattr(self, attribute)
+
+    def set(self, attribute: str, value: Any):
+        """
+        Simple wrapper for setattr for easy updating
+        :param attribute: attribute name as str
+        :param value: value to update with
+        :return: Attribute updated to value
+        """
+        return setattr(self, attribute, value)
 
     def _check_if_annotation_matches(self) -> Generator:
         """
@@ -70,6 +79,19 @@ class BaseModelClass:
             type_match_check,
         ) in self._check_if_annotation_matches():
             if type_match_check is False:
+                if (type_annotation is datetime.datetime) and (
+                    isinstance(self.get(attribute_name), str)
+                ):
+                    try:
+                        coerced_datetime_check = datetime.datetime.fromisoformat(
+                            self.get(attribute_name)
+                        )
+                        if isinstance(coerced_datetime_check, datetime.datetime):
+                            self.set(attribute_name, coerced_datetime_check)
+                            continue
+                    except ValueError:
+                        pass
+
                 attribute_fail_list.append(
                     create_type_error_str(attribute_name, type_annotation)
                 )

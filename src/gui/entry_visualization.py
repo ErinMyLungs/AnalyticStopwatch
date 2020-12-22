@@ -97,21 +97,40 @@ class EntryTable:
     Table for Listing most recent time entries
     """
 
+    def __init__(self):
+        self.prior_id = None
+        self.table_name = "Entries##table"
+
+    def render(self, entries: List[Entry]) -> None:
+        """
+        Checks if entries in parent have updated
+        If so it'll clear and re-render the table
+        :param entries: Entries passed in parent class
+        :return: Updated table with new data
+        """
+
+        if id(entries) == self.prior_id:
+            return
+        self.prior_id = id(entries)
+        c.clear_table(self.table_name)
+        for entry in entries:
+            self.add_row_to_entry_table(entry)
+
     def create_table(self, input_data: List[Entry]) -> None:
         """
         Creates table widget with name Entries##table
         :param input_data: Initial data to create table with
         :return: Table loaded with entries
         """
+        self.prior_id = id(input_data)
         c.add_table(
-            "Entries##table",
+            self.table_name,
             headers=["Project", "Description", "Duration", "Start", "End"],
         )
         for single_entry in input_data:
             self.add_row_to_entry_table(single_entry)
 
-    @staticmethod
-    def add_row_to_entry_table(entry: Entry) -> None:
+    def add_row_to_entry_table(self, entry: Entry) -> None:
         """
         Helper to add entry to the table
         :param entry: A single entry to convert to entries table
@@ -124,7 +143,7 @@ class EntryTable:
             entry.start_time.time().strftime("%I:%M"),
             entry.end_time.time().strftime("%I:%M"),
         ]
-        c.add_row("Entries##table", row_data)
+        c.add_row(self.table_name, row_data)
 
 
 task_chart = Chart()

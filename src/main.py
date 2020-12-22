@@ -144,7 +144,6 @@ class PyTogglGUI(BaseGUI):
         )
         entry = self.db.add_entry(entry_to_insert, return_value=True)
         self.entries = [*self.entries, entry]
-        entry_table.add_row_to_entry_table(entry)
 
     def save_new_project(self, *_args):
         """
@@ -233,6 +232,14 @@ class PyTogglGUI(BaseGUI):
                             callback_data=name,
                         )
                     c.add_menu_item("Add project", callback=self.create_new_project)
+                with s.menu("Range##FilterMenu"):
+                    c.add_menu_item(
+                        name="Today", callback=self.filter_entries, check=False
+                    )
+                    c.add_menu_item(
+                        name="All Time", callback=self.filter_entries, check=True
+                    )
+
             c.set_value(
                 "timer_text",
                 datetime.time.strftime(datetime.datetime.now().time(), "%H:%M:%S"),
@@ -260,6 +267,7 @@ class PyTogglGUI(BaseGUI):
         Updates timer text continuously and updates task_chart on entries update
         """
         task_chart.render(self.entries)
+        entry_table.render(self.entries)
         if self.tracking:
             c.set_value("timer_text", str(self.time_delta))
         else:
@@ -267,6 +275,26 @@ class PyTogglGUI(BaseGUI):
                 "timer_text",
                 datetime.time.strftime(datetime.datetime.now().time(), "%H:%M:%S"),
             )
+
+    def filter_entries(self, sender, _data):
+        """
+        Filters entries into this week or just today for display
+        :param sender: Sender to call this
+        :return: self.entries is updated to reflect entries from today
+        """
+        if sender == "All Time":
+            self.entries = self.db.get_all_entries(True)
+            c.configure_item("All Time", check=True)
+            c.configure_item("Today", check=False)
+
+        elif sender == "Today":
+            date_obj = datetime.date.today().isoformat()
+            query_str = f"SELECT * FROM entries WHERE start_time > DATE('{date_obj}');"
+            result_query = self.db.db.query(query_str)
+            new_entries = [Entry(**entry) for entry in result_query]
+            self.entries = new_entries
+            c.configure_item("All Time", check=False)
+            c.configure_item("Today", check=True)
 
 
 if __name__ == "__main__":
