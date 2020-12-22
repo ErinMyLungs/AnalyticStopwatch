@@ -1,9 +1,11 @@
 """ Module for pie chart and table GUI elements """
+import datetime
+from collections import defaultdict
 from typing import List
 
 import dearpygui.core as c
 
-from models import Entry
+from src.models import Entry
 
 
 class Chart:
@@ -16,10 +18,39 @@ class Chart:
         self.labels = ["one", "two", "three"]
         self.plot_label = "##TaskChart"
         self.chart = lambda: c.add_pie_series(
-            self.plot_label, "TaskPieChart", self.data, self.labels, 0.5, 0.5, 0.5
+            self.plot_label,
+            "TaskPieChart",
+            self.data,
+            self.labels,
+            0.5,
+            0.4,
+            0.4,
         )
+        self.prior_id = None
 
-    # def
+    def render(self, entries: List[Entry]) -> None:
+        """
+        Render method that checks for ID change before rerunning calculations
+        :param entries: List of entries to display
+        :return: None but calls update chart on change
+        """
+
+        if id(entries) == self.prior_id:
+            return
+
+        self.prior_id = id(entries)
+        project_dict = defaultdict(datetime.timedelta)
+        total_duration = datetime.timedelta()
+        for entry in entries:
+            total_duration += entry.duration
+            project_dict[entry.project_name] += entry.duration
+
+        labels, data = list(), list()
+        for project, time in project_dict.items():
+            labels.append(project)
+            data.append((time / total_duration))
+
+        self.update_chart(data, labels)
 
     def update_chart(self, data: List[float], labels: List[str]) -> None:
         """
@@ -30,18 +61,19 @@ class Chart:
         """
         self.data = data
         self.labels = labels
-
         c.clear_plot(self.plot_label)
         self.chart()
 
-    def create_chart(self, data: List[float], labels: List[str]) -> None:
+    def create_chart(self, data: List[float] = None, labels: List[str] = None) -> None:
         """
         Creates task chart window using base data
         :return: None
         """
         # c.
-        self.data = data
-        self.labels = labels
+        if data is not None:
+            self.data = data
+        if labels is not None:
+            self.labels = labels
         c.add_plot(
             self.plot_label,
             no_mouse_pos=True,
