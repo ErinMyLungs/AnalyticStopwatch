@@ -16,6 +16,23 @@ from dearpygui.core import (
 from dearpygui.simple import window
 
 
+def start_development_windows(logger: str):
+    """
+    Starts doc, debug, and logger window
+    """
+    add_doc_window(name="Core Documentation", x_pos=0, y_pos=800)
+    end()
+
+    show_logger()
+
+    # for some reason the default logger doesn't show the first
+    # log_info call so this clears that out.
+    log_info("Clearing out initial issue with logger", logger=logger)
+
+    add_debug_window(name="Debug", x_pos=0, y_pos=300)
+    end()
+
+
 def debug_get_window_pos(sender, data):
     """
     Debug setup for getting location configs of windows
@@ -53,8 +70,8 @@ def debug_get_window_pos(sender, data):
 def debug_get_location_gui(logger="log"):
     """
     Simple text input + location window for checking default config x/y pos
-
     """
+
     with window("Location", autosize=True, y_pos=0):
         add_text(
             """
@@ -69,20 +86,3 @@ Window name will look for all windows that name contains the string, caps insens
             callback_data=logger,
         )
         add_checkbox("Print invisible", default_value=False)
-
-
-def start_development_windows(logger: str):
-    """
-    Starts doc, debug, and logger window
-    """
-    add_doc_window(name="Core Documentation", x_pos=0, y_pos=800)
-    end()
-
-    show_logger()
-
-    # for some reason the default logger doesn't show the first
-    # log_info call so this clears that out.
-    log_info("Clearing out initial issue with logger", logger=logger)
-
-    add_debug_window(name="Debug", x_pos=0, y_pos=300)
-    end()

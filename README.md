@@ -13,59 +13,39 @@ The end-goal is a local, open-source timer that is hackable and can automate spe
 ![Development View](./repo_resources/development_mode.png)
 
 ## Current Next Steps:
-~~* Integrate sqlite DB of timer sessions~~
-* Add inputs for specific task descriptions (text box)
-* Add inputs for tags
-* Add report CSV output
-* Add on-the-fly graph representations
+* [X] Integrate sqlite DB of timer sessions
+* [X] Add inputs for specific task descriptions (text box)
+* [ ] Add on-the-fly graph representations
+  * [X] Task Breakdown
+  * [ ] Total Hours (per task and total)
+  * [ ] Total Billed (per task and total)
+* [ ] Add report CSV output
+* [ ] Add tests for main.py + gui module
+* [ ] Put on PyPI
+* [ ] Setup with pipx for app deployment
 
 ## Repo Structure
 
-### AnalyticStopwatch/src
+This repo follows a pretty standard layout with `main.py` being the GUI front-end + database composed together to make the stopwatch app itself.
 
-### gui.py
-Two main classes - 
-* BaseGUI 
-* PyTogglGUI that inherits from BaseGUI
 
-#### BaseGUI
-This has basic initialization of screens, loading of fonts, and development tools. The biggest help here is the .log functions which make logging in PyTogglGUI much simpler.
+### Outline:
 
-#### PyTogglGUI
-This is the timer tracking class. Lots of properties and setters but the meat is:
-* `flip_timer_state` that activates the stopwatch function
-* `render` which updates the clock/timer text on each frame draw
-* `run` which builds the timer window itself
+* `src/`  - contains all code required to run PyToggl
+   * `main.py` - The main file that combines GUI, database, and application logic to make the above images
+   * `database.py` - Contains the Database class that does CRUD operations for main.py
+   * `models.py` - Dataclasses that represent rows in the Entries and Projects table
+   * `data/` - Contains local data storage. In production it stores data in `data/timer.db`
+   * `gui/` - All reusable GUI components
+     * `base_gui.py` - Base GUI class with loggers and basic development/production switchers.
+     * `dev_gui.py` - This holds quick GUI screens tossed together for development.
+     * `entry_visualization.py` - Contains task_chart and entry_table components and their class definitions
+   * `tests` - Test suite using Pytest + Hypothesis
 
-Creating the GUI can be as simple as:
-```python
-gui = PyTogglGUI(development=False, db_uri="sqlite_filepath")
-gui.run()
-```
+### Testing Coverage
 
-### database.py
-Contains Database class that handles initialization and helper methods for accessing local sqlite db.
+Current stats:
+* database.py 92% covered
+* models.py 72% covered
 
-### models.py
-Contains dataclasses for:
-* Entry
-* Project
-
-Also contains a base class with helper methods used in the above.
-
-#### ModelHelperMixin
-There are 2 simple methods and 2 rather fancy methods implemented:
-
-simple helpers are:
-* `to_dict` which is convenience for calling asdict on the dataclass
-* `get` which uses the getattr on self but with no default
-
-Some base validation has been created on attributes with:
-* `__post_init__`
-* `_check_if_annotation_matches`
- 
-`__post_init_` Validates that all attributes match their type annotation and that all integers can be converted to a sqlite valid integer. Thank you Hypothesis for pointing this out although if I'm ever making a rate of more than 9223372036854775807 on a project then I might have to upgrade the database.
-
-### AnalyticalStopwatch/src/tests
-
-Use of hypothesis testing and pytest. Quite exciting!
+Currently, missing GUI tests.
