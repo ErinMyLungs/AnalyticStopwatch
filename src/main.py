@@ -289,9 +289,7 @@ class PyTogglGUI(BaseGUI):
                 with s.menu("Projects##ProjectMenu"):
                     for name in self.db.get_project_names():
                         c.add_menu_item(
-                            name=name,
-                            callback=self.select_project,
-                            callback_data=name,
+                            name=name, callback=self.select_project, callback_data=name
                         )
                     c.add_menu_item("Add project", callback=self.create_new_project)
             c.set_value(
