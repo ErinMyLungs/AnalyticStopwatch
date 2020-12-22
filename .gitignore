@@ -13,9 +13,7 @@ secrets.py
 env
 venv
 ## Database ignores
-src/data/timer.db
-src/data/development.db
-src/data/project_data.json
+src/data/*
 *.db-shm
 *.db-wal
 .hypothesis
