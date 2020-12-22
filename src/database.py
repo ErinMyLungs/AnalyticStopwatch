@@ -41,7 +41,7 @@ class Database:
     """
 
     def __init__(
-        self, db_uri: str = "sqlite:///data/timer.db", development: bool = False
+        self, db_uri: str = "sqlite:///src/data/timer.db", development: bool = False
     ):
         """
         :param db_uri: path to sqlite db file. Either path or URI
@@ -98,11 +98,11 @@ class Database:
 
             for project in project_starter_data:
                 self.db["projects"].insert(project)
-
-        with entries_pickle_path.open("rb") as file:
-            entries = pickle.load(file)
-        for entry in entries:
-            self.db["entries"].insert(entry.to_dict())
+        if entries_pickle_path.exists():
+            with entries_pickle_path.open("rb") as file:
+                entries = pickle.load(file)
+            for entry in entries:
+                self.db["entries"].insert(entry.to_dict())
 
     def add_entry(self, entry: Entry, return_value: bool = False) -> Union[int, Entry]:
         """

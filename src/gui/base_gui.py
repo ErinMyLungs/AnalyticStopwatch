@@ -1,4 +1,5 @@
 """ Holds baseclass for GUI with helpers and logger methods """
+from pathlib import Path
 from typing import Tuple
 
 from dearpygui import core as c
@@ -47,7 +48,11 @@ class BaseGUI:
         """
         Loads up input font and sets up development windows.
         """
-        c.add_additional_font(file="./fonts/InputMono-Black.ttf", size=16)
+        font = list(Path().glob("**/fonts/InputMono-Black.ttf"))[0]
+        if font.exists():
+            c.add_additional_font(file=str(font), size=16)
+        else:
+            print("Cannot load font")
         c.set_main_window_title(self.title)
         c.set_main_window_size(*self.window_size)
         if self.development:

@@ -101,6 +101,16 @@ class PyTogglGUI(BaseGUI):
         """
         return c.get_value("Description")
 
+    def switch_task(self, *_args) -> None:
+        """
+        Saves entry but maintains timer so updating description is inline
+        :param _args: sender, data in 0, 1 tuple position
+        :return: None
+        """
+        self.save_new_entry()
+        self.set_start_time()
+        c.set_value("Description", "")
+
     def flip_timer_state(self, *_args):
         """
         Flips tracking bool, sets starting time, and flips button label
@@ -109,9 +119,11 @@ class PyTogglGUI(BaseGUI):
         """
         if self.tracking:
             label = "Start Timer"
+            c.configure_item("Switch Task", show=False)
             self.save_new_entry()
         else:
             label = "End Timer"
+            c.configure_item("Switch Task", show=True)
 
         s.set_item_label("Start Timer", label=label)
         self.set_tracking()
@@ -234,7 +246,13 @@ class PyTogglGUI(BaseGUI):
                 datetime.time.strftime(datetime.datetime.now().time(), "%H:%M:%S"),
             )
 
-    def select_project(self, sender, data):
+    def select_project(self, _sender, data: str):
+        """
+        Selects project in menu
+        :param _sender: Menu item clicked
+        :param data: data which contains selected project name
+        :return: Sets main window title and self.selected_project
+        """
 
         if self.selected_project is not None:
             c.configure_item(self.selected_project, check=False)
@@ -286,6 +304,7 @@ class PyTogglGUI(BaseGUI):
             )
             c.add_button(name="Start Timer", callback=self.flip_timer_state)
             c.add_same_line()
+            c.add_button(name="Switch Task", callback=self.switch_task, show=False)
 
             c.add_spacing()
             self.entries_table()
