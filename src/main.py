@@ -6,6 +6,7 @@ import dearpygui.core as c
 import dearpygui.simple as s
 
 from src.database import Database
+from src.gui import entry_table, task_chart
 from src.gui.base_gui import BaseGUI
 from src.gui.entry_visualization import Chart
 from src.models import Entry, Project
@@ -145,7 +146,7 @@ class PyTogglGUI(BaseGUI):
         )
         entry = self.db.add_entry(entry_to_insert, return_value=True)
         self.entries.append(entry)
-        self.add_row_to_entry_table(entry)
+        entry_table.add_row_to_entry_table(entry)
 
     def save_new_project(self, *_args):
         """
@@ -185,35 +186,6 @@ class PyTogglGUI(BaseGUI):
             c.add_input_int("monthly_frequency##new_project")
             c.add_input_int("weekly_hour_allotment##new_project")
             c.add_button("Save##SaveProject", callback=self.save_new_project)
-
-    @staticmethod
-    def add_row_to_entry_table(entry: Entry) -> None:
-        """
-        Helper to add entry to the table
-        :param entry: A single entry to convert to entries table
-        :return: New row attached to the Entries##table
-        """
-        row_data = [
-            entry.project_name,
-            entry.description,
-            str(entry.duration)[:10],
-            entry.start_time.time().strftime("%I:%M"),
-            entry.end_time.time().strftime("%I:%M"),
-        ]
-        c.add_row("Entries##table", row_data)
-
-    def entries_table(self):
-        """
-        Creates entries table and fills with all entries
-        :return: Entry table?
-        """
-
-        c.add_table(
-            "Entries##table",
-            headers=["Project", "Description", "Duration", "Start", "End"],
-        )
-        for entry in self.db.get_all_entries():
-            self.add_row_to_entry_table(entry)
 
     def render(self, *_args):
         """
@@ -307,9 +279,9 @@ class PyTogglGUI(BaseGUI):
             c.add_button(name="Switch Task", callback=self.switch_task, show=False)
 
             c.add_spacing()
-            self.entries_table()
+            entry_table.create_table(input_data=self.entries)
             c.add_spacing()
-            self.pichart.task_chart(
+            self.pichart.create_chart(
                 data=[0.2, 0.5, 0.3], labels=self.db.get_project_names()
             )
 
