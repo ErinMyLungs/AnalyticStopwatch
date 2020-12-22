@@ -131,9 +131,6 @@ class PyTogglGUI(BaseGUI):
     def save_new_entry(self) -> None:
         """
         Inserts timer entry to entries table
-        :param return_value: Option to return the created entry
-        :type return_value: bool
-        :return: None or created entry in db.
         """
         entry_to_insert = Entry(
             id=None,
@@ -288,10 +285,7 @@ class PyTogglGUI(BaseGUI):
             c.configure_item("Today", check=False)
 
         elif sender == "Today":
-            date_obj = datetime.date.today().isoformat()
-            query_str = f"SELECT * FROM entries WHERE start_time > DATE('{date_obj}');"
-            result_query = self.db.db.query(query_str)
-            new_entries = [Entry(**entry) for entry in result_query]
+            new_entries = self.db.get_entries_today(True)
             self.entries = new_entries
             c.configure_item("All Time", check=False)
             c.configure_item("Today", check=True)

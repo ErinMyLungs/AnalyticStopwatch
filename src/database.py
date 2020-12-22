@@ -1,4 +1,5 @@
 """ Contains database mixin class """
+import datetime
 import json
 import pickle
 from pathlib import Path
@@ -211,6 +212,39 @@ class Database:
         """
         return self._eager_loader(
             self._get_multi_entries, eager_loading=eager_loading, **kwargs
+        )
+
+    @as_entry
+    def _query_entries(self, query_str="SELECT * FROM entries;", **kwargs):
+        """
+        Runs query on entries. If you don't select * entries then this will fail!
+        :param kwargs: arguments to adjust query
+        :keyword query: This is a critical keyword
+        :return:
+        """
+        return self.db.query(query=query_str, **kwargs)
+
+    def get_entries_today(self, eager_loading=True) -> List[Entry]:
+        """
+        Returns entries from today only
+        :param eager_loading: Default True, auto-loads into list of Entries
+        :return: list of entries or generator
+        """
+        ##################################################################################
+        # It's normally a terrible idea to use f-strings for building queries because
+        # this opens up risks for SQL Injection. While that risk is partially mitigated
+        # by the fact this is a desktop app that is not connected to the internet and
+        # this isn't taking user input, it'd be pretty trivial to somehow adjust date_obj
+        # either in memory, directly editing the python script, or manipulating/monkeypatching
+        # .isoformat() to return some valid ending to the sql query + a drop tables command.
+        #
+        # So why are we using raw sql? Because raw sql is fun and it's decent practice.
+        ##################################################################################
+        date_obj = datetime.date.today().isoformat()
+
+        query_str = f"SELECT * FROM entries WHERE start_time > DATE('{date_obj}');"
+        return self._eager_loader(
+            self._query_entries, eager_loading=eager_loading, query_str=query_str
         )
 
     def get_project_names(self) -> List[str]:
