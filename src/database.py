@@ -52,7 +52,7 @@ class Database:
         """
         self.development = development
         if development is True:
-            self._db_uri = "sqlite:///data/development.db"
+            self._db_uri = "sqlite:///src/data/development.db"
             # clear db_path
 
             for db_path in Path(".").glob("**/development.db*"):
@@ -81,8 +81,8 @@ class Database:
 
     def _pre_seed_db(
         self,
-        project_starter_data_path: Path = Path("./data/project_data.json"),
-        entries_pickle_path: Path = Path("./data/entries"),
+        project_starter_data_path: Path = Path("./src/data/project_data.json"),
+        entries_pickle_path: Path = Path("./src/data/entries"),
     ) -> None:
         """
         Pre-seeding the database with projects and entries. Projects can be stored as json, entries

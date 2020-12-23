@@ -292,5 +292,16 @@ class PyTogglGUI(BaseGUI):
 
 
 if __name__ == "__main__":
-    gui = PyTogglGUI(development=True)
+    import argparse
+
+    parser = argparse.ArgumentParser(description="Start PyToggl to track your hours.")
+    parser.add_argument(
+        "-X",
+        "--development",
+        default=False,
+        action="store_true",
+        help="Launch in development mode with a fresh database that is wiped on next launch.",
+    )
+    args = parser.parse_args()
+    gui = PyTogglGUI(development=args.development)
     gui.run()

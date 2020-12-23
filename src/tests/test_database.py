@@ -20,8 +20,8 @@ def db() -> Database:
 
 @pytest.fixture()
 def seed_data():
-    project_seed_data = Path("./data/project_data.json")
-    entries_seed_data = Path("./data/entries")
+    project_seed_data = Path("./src/data/project_data.json")
+    entries_seed_data = Path("./src/data/entries")
     project_data = None
     entry_data = None
 
@@ -44,7 +44,7 @@ def test_intialization(db, seed_data):
     Tests that on creation a dataabase with projects and entries table is created
     """
 
-    assert db.db.url == "sqlite:///data/development.db"
+    assert db.db.url == "sqlite:///src/data/development.db"
 
     assert db.projects == db.db.get_table("projects")
     assert db.entries == db.db.get_table("entries")
