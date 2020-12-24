@@ -3,7 +3,6 @@ from pathlib import Path
 from typing import Tuple
 
 from dearpygui import core as c
-
 from src.gui.dev_gui import start_development_windows
 
 
@@ -17,7 +16,7 @@ class BaseGUI:
         development: bool = False,
         *,
         dev_window_size: Tuple[int, int] = (1000, 800),
-        prod_window_size: Tuple[int, int] = (700, 700),
+        prod_window_size: Tuple[int, int] = (700, 800),
         title: str = "PyToggl",
         logger: str = "",
     ):
@@ -55,6 +54,7 @@ class BaseGUI:
             print("Cannot load font")
         c.set_main_window_title(self.title)
         c.set_main_window_size(*self.window_size)
+        c.set_style_window_rounding(0)
         if self.development:
             c.set_main_window_pos(x=1120, y=0)
             start_development_windows(self.logger)

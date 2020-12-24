@@ -4,9 +4,8 @@ from typing import Optional
 
 import dearpygui.core as c
 import dearpygui.simple as s
-
 from src.database import Database
-from src.gui import entry_table, task_chart
+from src.gui import entry_table, task_chart, timer_display
 from src.gui.base_gui import BaseGUI
 from src.models import Entry, Project
 
@@ -195,7 +194,7 @@ class PyTogglGUI(BaseGUI):
         c.set_main_window_title(f"{self.title} - {data}")
         c.configure_item(data, check=True)
 
-    def run(self, width: int = 700, height: int = 700, **kwargs):
+    def run(self, width: int = 700, height: int = 800, **kwargs):
         # pylint: disable=arguments-differ
         """
         GUI definition and runs dearpygui
@@ -208,6 +207,7 @@ class PyTogglGUI(BaseGUI):
             x_pos = 300
         else:
             x_pos = 0
+
         with s.window(
             name="Timer",
             x_pos=x_pos,
@@ -218,15 +218,14 @@ class PyTogglGUI(BaseGUI):
             no_title_bar=True,
             no_resize=not self.development,
             no_move=not self.development,
+            no_bring_to_front_on_focus=True,
             **kwargs,
         ):
             with s.menu_bar("Main Menu Bar"):
                 with s.menu("Projects##ProjectMenu"):
                     for name in self.db.get_project_names():
                         c.add_menu_item(
-                            name=name,
-                            callback=self.select_project,
-                            callback_data=name,
+                            name=name, callback=self.select_project, callback_data=name
                         )
                     c.add_menu_item("Add project", callback=self.create_new_project)
                 with s.menu("Range##FilterMenu"):
@@ -237,11 +236,7 @@ class PyTogglGUI(BaseGUI):
                         name="All Time", callback=self.filter_entries, check=True
                     )
 
-            c.set_value(
-                "timer_text",
-                datetime.time.strftime(datetime.datetime.now().time(), "%H:%M:%S"),
-            )
-            c.add_text(name="TimerText", source="timer_text")
+            c.add_spacing(count=40, parent="Timer", before="Description")
             c.add_input_text(
                 name="Description", default_value="coding", label="Description"
             )
@@ -255,7 +250,7 @@ class PyTogglGUI(BaseGUI):
             task_chart.create_chart(
                 data=[0.2, 0.5, 0.3], labels=self.db.get_project_names()
             )
-
+        timer_display.create_timer(x_pos=(x_pos + 60), y_pos=20)
         c.set_render_callback(self.render)
         c.start_dearpygui()
 
@@ -266,12 +261,9 @@ class PyTogglGUI(BaseGUI):
         task_chart.render(self.entries)
         entry_table.render(self.entries)
         if self.tracking:
-            c.set_value("timer_text", str(self.time_delta))
+            timer_display.render(time_to_render=self.time_delta)
         else:
-            c.set_value(
-                "timer_text",
-                datetime.time.strftime(datetime.datetime.now().time(), "%H:%M:%S"),
-            )
+            timer_display.render(time_to_render=datetime.datetime.now())
 
     def filter_entries(self, sender, _data):
         """

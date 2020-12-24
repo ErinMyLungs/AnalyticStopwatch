@@ -1,7 +1,7 @@
 """ Contains module for timer face """
 import datetime
 from enum import Enum
-from typing import List, Union, Dict
+from typing import Dict, List, Union
 
 import dearpygui.core as c
 import dearpygui.simple as s
@@ -186,7 +186,7 @@ class Number:
             no_move=True,
             no_background=False,
         )
-        with s.window("timer", **window_args):
+        with s.window("single_cell", **window_args):
             with s.group(name="timergroup", horizontal=True):
                 self.build_number_box()
 
@@ -200,13 +200,15 @@ class Timer:
     Creates a 6 cell timer display with create_window, render, and run commands
     """
 
-    def __init__(self):
-        self.sec_0 = Number(canvas="sec_0")
-        self.sec_1 = Number(canvas="sec_1")
-        self.min_0 = Number(canvas="min_0")
-        self.min_1 = Number(canvas="min_1")
-        self.hour_0 = Number(canvas="hour_0")
-        self.hour_1 = Number(canvas="hour_1")
+    def __init__(self, color=None):
+        if color is None:
+            color = [120, 255, 120]
+        self.sec_0 = Number(canvas="sec_0", color=color)
+        self.sec_1 = Number(canvas="sec_1", color=color)
+        self.min_0 = Number(canvas="min_0", color=color)
+        self.min_1 = Number(canvas="min_1", color=color)
+        self.hour_0 = Number(canvas="hour_0", color=color)
+        self.hour_1 = Number(canvas="hour_1", color=color)
         self.display = [
             (self.hour_0, self.hour_1),
             (self.min_0, self.min_1),
@@ -269,7 +271,7 @@ class Timer:
         for kwarg, value in kwargs.items():
             window_args[kwarg] = value
 
-        with s.window("timer", **window_args):
+        with s.window("timer##display", **window_args):
             with s.group(name="timergroup", horizontal=True):
                 for section in self.display:
                     for cell in section:
@@ -295,7 +297,7 @@ class Timer:
         c.start_dearpygui()
 
 
-timer = Timer()
+timer_display = Timer()
 number = Number()
 
 if __name__ == "__main__":
