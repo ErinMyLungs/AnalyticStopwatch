@@ -1,7 +1,7 @@
 """ Contains module for timer face """
 import datetime
 from enum import Enum
-from typing import List, Union
+from typing import List, Union, Dict
 
 import dearpygui.core as c
 import dearpygui.simple as s
@@ -51,23 +51,46 @@ class Number:
         else:
             self.color = color
 
-        self.line_trigger = {
-            "top": lambda: self.regular_line(x=3, direction=Direction.up, tag="top"),
-            "top_left": lambda: self.regular_line(y=3, tag="top_left"),
+        self.line_trigger = self._line_trigger()
+
+        for key, value in self.line_trigger.items():
+            setattr(self, key, value)
+
+    def _line_trigger(self,) -> Dict[str, callable]:
+        """
+        This holds the specific values to render all lines for the numbers
+        :return: callable dict
+        """
+        return {
+            "top": lambda: self.regular_line(
+                x_offset=3, direction=Direction.up, tag="top"
+            ),
+            "top_left": lambda: self.regular_line(y_offset=3, tag="top_left"),
             "top_right": lambda: self.regular_line(
-                x=126, y=3, direction=Direction.right, tag="top_right"
+                x_offset=66, y_offset=3, direction=Direction.right, tag="top_right"
             ),
             "center": lambda: self.regular_line(
-                x=-12, y=81, direction=Direction.center, tag="center"
+                x_offset=13, y_offset=64.5, direction=Direction.center, tag="center"
             ),
-            "bottom_left": lambda: self.regular_line(y=100, tag="bottom_left"),
+            "bottom_left": lambda: self.regular_line(y_offset=66.6, tag="bottom_left"),
             "bottom_right": lambda: self.regular_line(
-                x=126, y=100, direction=Direction.right, tag="bottom_right"
+                x_offset=66,
+                y_offset=66.6,
+                direction=Direction.right,
+                tag="bottom_right",
             ),
             "bottom": lambda: self.regular_line(
-                x=123, y=224, direction=Direction.down, tag="bottom"
+                x_offset=3, y_offset=129.6, direction=Direction.down, tag="bottom"
             ),
         }
+
+    def get(self, attribute: str):
+        """
+        Fetches attribute by string name
+        :param attribute: attribute name
+        :return: the attribute value
+        """
+        return getattr(self, attribute)
 
     def render(self, new_lines, num):
         """
@@ -81,7 +104,8 @@ class Number:
             return
         self.clear()
         for line in new_lines:
-            self.line_trigger[line]()
+            draw_line = self.get(line)
+            draw_line()
         self.prior_num = num
 
     def clear(self):
@@ -91,39 +115,43 @@ class Number:
         c.clear_drawing(self.canvas)
 
     def regular_line(
-        self, x=0, y=0, direction: Direction = Direction.left, tag: str = None
+        self,
+        x_offset=0,
+        y_offset=0,
+        direction: Direction = Direction.left,
+        tag: str = None,
     ):
         """
         Creates a line in the number box in the digital clock format
-        :param x: base x-coord
-        :param y: base y-coord
+        :param x_offset: x translation magnitude, as x gets larger, the line shifts right
+        :param y_offset: y translation magnitude, as y increases the line shifts down
         :param direction: Which type of line to render
         :param tag: string to tag the line with
         :return: drawn polygon on self.canvas
         """
         if tag is None:
             tag = str(direction.value)
-        translate = lambda coords: [coords[0] + x, coords[1] + y]
-        position = [[0, 0], [30, 30], [30, 90], [0, 120]]
+        translate = lambda coords: [coords[0] + x_offset, coords[1] + y_offset]
 
         if direction == Direction.left:
-            position = [[0, 0], [30, 30], [30, 90], [0, 120]]
+            position = [(0.0, 0.0), (20.0, 20.0), (20.0, 60.0), (0.0, 80.0)]
         elif direction == Direction.up:
-            position = list(map(lambda coord: [coord[1], coord[0]], position))
+            position = [(0.0, 0.0), (20.0, 20.0), (60.0, 20.0), (80.0, 0.0)]
         elif direction == Direction.down:
-            position = list(map(lambda coord: [-coord[1], -coord[0]], position))
+            position = [(80.0, 20.0), (60.0, 0.0), (20.0, 0.0), (0.0, 20.0)]
         elif direction == Direction.right:
-            position = list(map(lambda coord: [-coord[0], coord[1]], position))
+            position = [(20.0, 0.0), (0.0, 20.0), (0.0, 60.0), (20.0, 80.0)]
         else:
             position = [
-                [30, 30],
-                [45, 15],
-                [105, 15],
-                [120, 30],
-                [105, 45],
-                [45, 45],
-                [30, 30],
+                (0.0, 10.0),
+                (10.0, 0.0),
+                (50.0, 0.0),
+                (60.0, 10.0),
+                (50.0, 20.0),
+                (10.0, 20.0),
+                (0.0, 10.0),
             ]
+
         c.draw_polygon(
             self.canvas,
             points=list(map(translate, position)),
@@ -138,7 +166,33 @@ class Number:
         :param group: Group to put drawing in
         :return: Drawing number box ready to render
         """
-        c.add_drawing(self.canvas, width=125, height=225, parent=group)
+        c.add_drawing(self.canvas, width=90, height=150, parent=group)
+
+    def run(self):
+        """
+        A very basic stand-aloen run method to show what this looks like by default
+        :return: General number display example
+        """
+        base = BaseGUI(development=True)
+        base.initialize_base_screens()
+        window_args = dict(
+            autosize=False,
+            height=250,
+            width=900,
+            x_pos=0,
+            y_pos=0,
+            no_title_bar=True,
+            no_resize=True,
+            no_move=True,
+            no_background=False,
+        )
+        with s.window("timer", **window_args):
+            with s.group(name="timergroup", horizontal=True):
+                self.build_number_box()
+
+        self.render(Digit.num_8, 8)
+
+        c.start_dearpygui()
 
 
 class Timer:
@@ -178,7 +232,7 @@ class Timer:
         return result_list
 
     def render(
-        self, *args, time_to_render: Union[datetime.datetime, datetime.timedelta]
+        self, *_args, time_to_render: Union[datetime.datetime, datetime.timedelta]
     ):
         """
         Renders timedelta or datetime onto the display
@@ -200,15 +254,16 @@ class Timer:
         :return: Create timer window plus timergroup
         """
         window_args = dict(
-            autosize=False,
-            height=250,
-            width=900,
+            autosize=True,
+            height=150,
+            width=540,
             x_pos=0,
             y_pos=0,
             no_title_bar=True,
             no_resize=True,
             no_move=True,
             no_background=True,
+            no_scrollbar=True,
         )
 
         for kwarg, value in kwargs.items():
@@ -240,5 +295,9 @@ class Timer:
         c.start_dearpygui()
 
 
+timer = Timer()
+number = Number()
+
 if __name__ == "__main__":
     Timer().run()
+    # Number().run()
