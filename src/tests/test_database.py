@@ -6,11 +6,11 @@ from collections.abc import Generator
 from pathlib import Path
 
 import pytest
-from hypothesis import assume, given
+from tests.utils import entry_build_strategy, project_build_strategy
 
+from hypothesis import assume, given
 from src.database import Database
 from src.models import Entry, Project
-from tests.utils import entry_build_strategy, project_build_strategy
 
 
 @pytest.fixture(scope="module")
@@ -60,7 +60,7 @@ def test_intialization(db, seed_data):
 
 def test_production_flag():
     db = Database()
-    assert db._db_uri != "sqlite:///data/development.db"
+    assert db._db_uri != "sqlite:///src/data/development.db"
 
 
 def test_get_project_names(db):

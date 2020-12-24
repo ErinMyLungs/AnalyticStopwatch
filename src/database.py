@@ -6,7 +6,6 @@ from pathlib import Path
 from typing import Dict, List, Tuple, Union
 
 import dataset
-
 from src.models import Entry, Project
 
 

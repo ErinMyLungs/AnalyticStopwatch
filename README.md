@@ -8,7 +8,7 @@ The end-goal is a local, open-source timer that is hackable and can automate spe
 
 ## Images
 ### 'Production' GUI for usage
-![Productions View](./repo_resources/non_development.png)
+![Productions View](./repo_resources/pytoggl.gif)
 ### Development GUI with logger and debugger windows
 ![Development View](./repo_resources/development_mode.png)
 
