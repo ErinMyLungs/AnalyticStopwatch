@@ -1,8 +1,0 @@
-dataset
-dearpygui
-pandas
-isort
-pylint
-pytest
-pytest-cov
-hypothesis[cli]
