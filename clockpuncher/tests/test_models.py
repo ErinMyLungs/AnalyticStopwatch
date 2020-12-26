@@ -3,11 +3,11 @@
 
 import dataclasses
 
-from tests.utils import INT8_RANGE
-
-import models
 from hypothesis import given
 from hypothesis import strategies as st
+
+import clockpuncher.models as models
+from clockpuncher.tests.utils import INT8_RANGE
 
 
 @given(

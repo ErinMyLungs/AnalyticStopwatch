@@ -6,11 +6,12 @@ from collections.abc import Generator
 from pathlib import Path
 
 import pytest
-from tests.utils import entry_build_strategy, project_build_strategy
+from hypothesis import assume, given
 
 from clockpuncher.database import Database
 from clockpuncher.models import Entry, Project
-from hypothesis import assume, given
+from clockpuncher.tests.utils import (entry_build_strategy,
+                                      project_build_strategy)
 
 
 @pytest.fixture(scope="module")
