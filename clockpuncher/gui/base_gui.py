@@ -1,4 +1,5 @@
 """ Holds baseclass for GUI with helpers and logger methods """
+# pylint: disable=wrong-import-order
 from pathlib import Path
 from typing import Tuple
 

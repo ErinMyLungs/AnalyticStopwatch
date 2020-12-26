@@ -31,11 +31,6 @@ class PyTogglGUI(BaseGUI):
         super().__init__(**kwargs)
 
         self.db = Database(development=self.development)
-        from pathlib import Path
-
-        print("-" * 50)
-        print(Path().absolute())
-        print("-" * 50)
 
         self.entries = self.db.get_all_entries(True)
         self.selected_project = None

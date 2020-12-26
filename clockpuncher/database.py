@@ -52,14 +52,13 @@ class Database:
         self.development = development
         if development is True:
             self._db_uri = "sqlite:///clockpuncher/data/development.db"
-            # clear db_path
 
             for db_path in Path(".").glob("**/development.db*"):
                 db_path.unlink()
 
         else:
             db_path = Path(db_uri)
-            if db_path.exists() == False:
+            if db_path.exists() is False:
                 search_path = list(
                     Path("").absolute().parent.glob(f"**/{db_path.name}")
                 )
@@ -79,7 +78,7 @@ class Database:
         projects_table = self.db.create_table("projects")
         entries_table = self.db.create_table("entries")
         if projects_table.count() == 0:
-            initial_project = projects_table.insert(
+            projects_table.insert(
                 Project(
                     id=None,
                     project_name="1",
@@ -91,7 +90,7 @@ class Database:
             )
             projects_table.delete()
         if entries_table.count() == 0:
-            initial_entry = entries_table.insert(
+            entries_table.insert(
                 Entry(
                     id=None,
                     project_name="1",
