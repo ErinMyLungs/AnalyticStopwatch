@@ -4,8 +4,7 @@ from collections import defaultdict
 from typing import List
 
 import dearpygui.core as c
-
-from src.models import Entry
+from clockpuncher.models import Entry
 
 
 class Chart:
@@ -18,13 +17,7 @@ class Chart:
         self.labels = ["one", "two", "three"]
         self.plot_label = "##TaskChart"
         self.chart = lambda: c.add_pie_series(
-            self.plot_label,
-            "TaskPieChart",
-            self.data,
-            self.labels,
-            0.5,
-            0.4,
-            0.4,
+            self.plot_label, "TaskPieChart", self.data, self.labels, 0.5, 0.4, 0.4
         )
         self.prior_id = None
 

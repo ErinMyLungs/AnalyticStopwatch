@@ -5,7 +5,7 @@ from typing import Dict, List, Union
 
 import dearpygui.core as c
 import dearpygui.simple as s
-from src.gui.base_gui import BaseGUI
+from clockpuncher.gui.base_gui import BaseGUI
 
 
 class Direction(str, Enum):

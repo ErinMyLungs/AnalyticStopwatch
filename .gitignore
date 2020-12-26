@@ -13,7 +13,8 @@ secrets.py
 env
 venv
 ## Database ignores
-src/data/*
+clockpuncher/data/*
 *.db-shm
 *.db-wal
 .hypothesis
+dist

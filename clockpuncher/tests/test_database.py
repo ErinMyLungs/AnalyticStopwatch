@@ -8,9 +8,9 @@ from pathlib import Path
 import pytest
 from tests.utils import entry_build_strategy, project_build_strategy
 
+from clockpuncher.database import Database
+from clockpuncher.models import Entry, Project
 from hypothesis import assume, given
-from src.database import Database
-from src.models import Entry, Project
 
 
 @pytest.fixture(scope="module")
@@ -20,8 +20,8 @@ def db() -> Database:
 
 @pytest.fixture()
 def seed_data():
-    project_seed_data = Path("./src/data/project_data.json")
-    entries_seed_data = Path("./src/data/entries")
+    project_seed_data = Path("./clockpuncher/data/project_data.json")
+    entries_seed_data = Path("./clockpuncher/data/entries")
     project_data = None
     entry_data = None
 
@@ -44,7 +44,7 @@ def test_intialization(db, seed_data):
     Tests that on creation a dataabase with projects and entries table is created
     """
 
-    assert db.db.url == "sqlite:///src/data/development.db"
+    assert db.db.url == "sqlite:///clockpuncher/data/development.db"
 
     assert db.projects == db.db.get_table("projects")
     assert db.entries == db.db.get_table("entries")
@@ -60,7 +60,7 @@ def test_intialization(db, seed_data):
 
 def test_production_flag():
     db = Database()
-    assert db._db_uri != "sqlite:///src/data/development.db"
+    assert db._db_uri != "sqlite:///clockpuncher/data/development.db"
 
 
 def test_get_project_names(db):

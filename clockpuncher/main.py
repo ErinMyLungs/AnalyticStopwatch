@@ -4,10 +4,10 @@ from typing import Optional
 
 import dearpygui.core as c
 import dearpygui.simple as s
-from src.database import Database
-from src.gui import entry_table, task_chart, timer_display
-from src.gui.base_gui import BaseGUI
-from src.models import Entry, Project
+from clockpuncher.database import Database
+from clockpuncher.gui import entry_table, task_chart, timer_display
+from clockpuncher.gui.base_gui import BaseGUI
+from clockpuncher.models import Entry, Project
 
 
 class PyTogglGUI(BaseGUI):
@@ -31,6 +31,12 @@ class PyTogglGUI(BaseGUI):
         super().__init__(**kwargs)
 
         self.db = Database(development=self.development)
+        from pathlib import Path
+
+        print("-" * 50)
+        print(Path().absolute())
+        print("-" * 50)
+
         self.entries = self.db.get_all_entries(True)
         self.selected_project = None
         self.initialize_tracking_data()
@@ -283,6 +289,16 @@ class PyTogglGUI(BaseGUI):
             c.configure_item("Today", check=True)
 
 
+def main(development=False):
+    """
+    Entrypoint function to run the GUI
+    :return: None
+    """
+
+    gui = PyTogglGUI(development=development)
+    gui.run()
+
+
 if __name__ == "__main__":
     import argparse
 
@@ -295,5 +311,4 @@ if __name__ == "__main__":
         help="Launch in development mode with a fresh database that is wiped on next launch.",
     )
     args = parser.parse_args()
-    gui = PyTogglGUI(development=args.development)
-    gui.run()
+    main(development=args.development)

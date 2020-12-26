@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import Dict, List, Tuple, Union
 
 import dataset
-from src.models import Entry, Project
+from clockpuncher.models import Entry, Project
 
 
 def as_project(query):
@@ -41,7 +41,7 @@ class Database:
     """
 
     def __init__(
-        self, db_uri: str = "sqlite:///src/data/timer.db", development: bool = False
+        self, db_uri: str = "clockpuncher/data/timer.db", development: bool = False
     ):
         """
         :param db_uri: path to sqlite db file. Either path or URI
@@ -51,14 +51,22 @@ class Database:
         """
         self.development = development
         if development is True:
-            self._db_uri = "sqlite:///src/data/development.db"
+            self._db_uri = "sqlite:///clockpuncher/data/development.db"
             # clear db_path
 
             for db_path in Path(".").glob("**/development.db*"):
                 db_path.unlink()
 
         else:
-            self._db_uri = f"sqlite://{db_uri}" if db_uri.find("sqlite://") else db_uri
+            db_path = Path(db_uri)
+            if db_path.exists() == False:
+                search_path = list(
+                    Path("").absolute().parent.glob(f"**/{db_path.name}")
+                )
+                if search_path and search_path[0].exists():
+                    db_uri = str(search_path[0])
+
+            self._db_uri = f"sqlite:///{db_uri}" if db_uri.find("sqlite://") else db_uri
 
         self.db: dataset.database.Database = dataset.connect(self._db_uri)
         self.projects, self.entries = self.init_db()
@@ -68,9 +76,32 @@ class Database:
         Initializes the database and creates the tables if they don't exist.
         :return: returns the projects and entry tables
         """
-        projects_table = self.db.get_table("projects")
-        entries_table = self.db.get_table("entries")
+        projects_table = self.db.create_table("projects")
+        entries_table = self.db.create_table("entries")
+        if projects_table.count() == 0:
+            initial_project = projects_table.insert(
+                Project(
+                    id=None,
+                    project_name="1",
+                    client="client",
+                    rate=1,
+                    monthly_frequency=1,
+                    weekly_hour_allotment=1,
+                ).to_dict()
+            )
+            projects_table.delete()
+        if entries_table.count() == 0:
+            initial_entry = entries_table.insert(
+                Entry(
+                    id=None,
+                    project_name="1",
+                    description="entry",
+                    start_time=datetime.datetime.now(),
+                    end_time=datetime.datetime.now(),
+                ).to_dict()
+            )
 
+            entries_table.delete()
         if self.development is False:
             return projects_table, entries_table
 
@@ -80,8 +111,8 @@ class Database:
 
     def _pre_seed_db(
         self,
-        project_starter_data_path: Path = Path("./src/data/project_data.json"),
-        entries_pickle_path: Path = Path("./src/data/entries"),
+        project_starter_data_path: Path = Path("./clockpuncher/data/project_data.json"),
+        entries_pickle_path: Path = Path("./clockpuncher/data/entries"),
     ) -> None:
         """
         Pre-seeding the database with projects and entries. Projects can be stored as json, entries
@@ -92,6 +123,7 @@ class Database:
         :type entries_pickle_path: Path
         :return: None but database is seeded with data.
         """
+
         if project_starter_data_path.exists():
             with project_starter_data_path.open() as file:
                 project_starter_data = json.load(file)

@@ -2,8 +2,8 @@
 from pathlib import Path
 from typing import Tuple
 
+from clockpuncher.gui.dev_gui import start_development_windows
 from dearpygui import core as c
-from src.gui.dev_gui import start_development_windows
 
 
 class BaseGUI:
@@ -47,9 +47,10 @@ class BaseGUI:
         """
         Loads up input font and sets up development windows.
         """
-        font = list(Path().glob("**/fonts/InputMono-Black.ttf"))[0]
-        if font.exists():
-            c.add_additional_font(file=str(font), size=16)
+        font = list(Path("").absolute().parent.glob("**/InputMono-Black.ttf"))
+
+        if font and font[0].exists():
+            c.add_additional_font(file=str(font[0]), size=16)
         else:
             print("Cannot load font")
         c.set_main_window_title(self.title)

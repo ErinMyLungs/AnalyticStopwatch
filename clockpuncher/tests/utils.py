@@ -1,6 +1,6 @@
 """ Contains utilities and constants for testing """
+from clockpuncher.models import Entry, Project
 from hypothesis.strategies import builds, datetimes, integers, none, text
-from src.models import Entry, Project
 
 INT8_RANGE = dict(min_value=-9223372036854775807, max_value=9223372036854775807)
 PROJECT_HYPOTHESIS = dict(
