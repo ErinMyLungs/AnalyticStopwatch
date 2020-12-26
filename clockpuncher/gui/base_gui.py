@@ -1,10 +1,10 @@
 """ Holds baseclass for GUI with helpers and logger methods """
-# pylint: disable=wrong-import-order
 from pathlib import Path
 from typing import Tuple
 
-from clockpuncher.gui.dev_gui import start_development_windows
 from dearpygui import core as c
+
+from clockpuncher.gui.dev_gui import start_development_windows
 
 
 class BaseGUI:
@@ -18,7 +18,7 @@ class BaseGUI:
         *,
         dev_window_size: Tuple[int, int] = (1000, 800),
         prod_window_size: Tuple[int, int] = (700, 800),
-        title: str = "PyToggl",
+        title: str = "Clock Puncher!",
         logger: str = "",
     ):
         """
@@ -55,6 +55,14 @@ class BaseGUI:
 
             if font and font[0].exists():
                 c.add_additional_font(file=str(font[0]), size=16)
+        elif check_pipx.exists() is False:
+            font = list(
+                Path(__file__).resolve().parents[2].glob("**/fonts/InputMono-Black.ttf")
+            )
+            if font and font[0].exists():
+
+                c.add_additional_font(str(font[0].absolute()), size=16)
+
         else:
             print("Cannot load font")
         c.set_main_window_title(self.title)
