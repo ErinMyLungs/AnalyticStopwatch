@@ -5,6 +5,7 @@ from typing import Dict, List, Union
 
 import dearpygui.core as c
 import dearpygui.simple as s
+
 from clockpuncher.gui.base_gui import BaseGUI
 
 
@@ -56,7 +57,9 @@ class Number:
         for key, value in self.line_trigger.items():
             setattr(self, key, value)
 
-    def _line_trigger(self,) -> Dict[str, callable]:
+    def _line_trigger(
+        self,
+    ) -> Dict[str, callable]:
         """
         This holds the specific values to render all lines for the numbers
         :return: callable dict
@@ -224,11 +227,16 @@ class Timer:
         """
         time_str = str(timedelta)
         if len(time_str) > 8:
+            # Handles > 24 hour timedelta
             time_str = time_str.split(" ")[-1]
 
+        if 14 <= len(time_str) <= 15:
+            # handles sub-second resolution
+            time_str = time_str.split(".")[0]
         result_list = time_str.split(":")
 
         if len(time_str) == 7:
+            # Handles sub 10 hour timers
             result_list[0] = "0" + result_list[0]
 
         return result_list

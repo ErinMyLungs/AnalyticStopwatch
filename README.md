@@ -31,7 +31,7 @@ This repo follows a pretty standard layout with `main.py` being the GUI front-en
 
 ### Outline:
 
-* `src/`  - contains all code required to run PyToggl
+* `clockpuncher/`  - contains all code required to run Clock Puncher
    * `main.py` - The main file that combines GUI, database, and application logic to make the above images
    * `database.py` - Contains the Database class that does CRUD operations for main.py
    * `models.py` - Dataclasses that represent rows in the Entries and Projects table
@@ -40,6 +40,7 @@ This repo follows a pretty standard layout with `main.py` being the GUI front-en
      * `base_gui.py` - Base GUI class with loggers and basic development/production switchers.
      * `dev_gui.py` - This holds quick GUI screens tossed together for development.
      * `entry_visualization.py` - Contains task_chart and entry_table components and their class definitions
+      * `timer.py` - Contains Timer and Number GUI components that make up the clock display
    * `tests` - Test suite using Pytest + Hypothesis
 
 ### Testing Coverage
