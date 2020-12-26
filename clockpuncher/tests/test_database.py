@@ -44,7 +44,7 @@ def test_intialization(db, seed_data):
     Tests that on creation a dataabase with projects and entries table is created
     """
 
-    assert db.db.url == "sqlite:///clockpuncher/data/development.db"
+    assert db.db.url == f"sqlite:///{Path().home()}/.clockpuncher/data/development.db"
 
     assert db.projects == db.db.get_table("projects")
     assert db.entries == db.db.get_table("entries")

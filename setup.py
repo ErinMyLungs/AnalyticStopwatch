@@ -23,7 +23,7 @@ def get_version():
 
 
 setup(
-    name="pycowsay",
+    name="clockpuncher",
     version="0.1.0",
     author="Erin Maestas",
     author_email="ErinLMaestas@gmail.com",
@@ -43,10 +43,5 @@ setup(
     # license and classifier list:
     # https://pypi.org/pypi?%3Aaction=list_classifiers
     license="License :: OSI Approved :: MIT License",
-    classifiers=[
-        "Programming Language :: Python",
-        # "Programming Language :: Python :: 3",
-        # "Operating System :: OS Independent",
-        # "Private :: Do Not Upload"
-    ],
+    classifiers=["Programming Language :: Python"],
 )

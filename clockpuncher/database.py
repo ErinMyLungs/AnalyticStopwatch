@@ -40,32 +40,32 @@ class Database:
     This class structures the database with initialization, access and insert methods
     """
 
-    def __init__(
-        self, db_uri: str = "clockpuncher/data/timer.db", development: bool = False
-    ):
+    def __init__(self, db_uri: Path = None, development: bool = False):
         """
         :param db_uri: path to sqlite db file. Either path or URI
-        :type db_uri: str
+        :type db_uri: Path to database sqlite
         :param development: Flag that wipes and re-inits the database
         :type development: bool
         """
         self.development = development
         if development is True:
-            self._db_uri = "sqlite:///clockpuncher/data/development.db"
-
-            for db_path in Path(".").glob("**/development.db*"):
+            db_path = Path().home() / ".clockpuncher/data/development.db"
+            if db_path.exists():
                 db_path.unlink()
-
+            else:
+                db_path.parent.mkdir(parents=True, exist_ok=True)
+                db_path.touch(exist_ok=True)
+            db_uri = str(db_path.absolute())
         else:
-            db_path = Path(db_uri)
-            if db_path.exists() is False:
-                search_path = list(
-                    Path("").absolute().parent.glob(f"**/{db_path.name}")
-                )
-                if search_path and search_path[0].exists():
-                    db_uri = str(search_path[0])
+            db_path = Path().home() / ".clockpuncher/data/timer.db"
+            if db_uri is None:
+                db_uri = str(db_path.absolute())
 
-            self._db_uri = f"sqlite:///{db_uri}" if db_uri.find("sqlite://") else db_uri
+                if db_path.exists is False:
+                    db_path.absolute().parent.mkdir(parents=True)
+                    db_path.touch()
+
+        self._db_uri = f"sqlite:///{db_uri}" if db_uri.find("sqlite://") else db_uri
 
         self.db: dataset.database.Database = dataset.connect(self._db_uri)
         self.projects, self.entries = self.init_db()

@@ -48,10 +48,13 @@ class BaseGUI:
         """
         Loads up input font and sets up development windows.
         """
-        font = list(Path("").absolute().parent.glob("**/InputMono-Black.ttf"))
+        # font = list(Path("").absolute().parent.glob("**/InputMono-Black.ttf"))
+        check_pipx = Path().home() / ".local/pipx/venvs/clockpuncher"
+        if check_pipx.exists() is True:
+            font = list(check_pipx.glob("**/fonts/InputMono-Black.ttf"))
 
-        if font and font[0].exists():
-            c.add_additional_font(file=str(font[0]), size=16)
+            if font and font[0].exists():
+                c.add_additional_font(file=str(font[0]), size=16)
         else:
             print("Cannot load font")
         c.set_main_window_title(self.title)
