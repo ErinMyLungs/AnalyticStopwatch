@@ -6,7 +6,8 @@ import dearpygui.core as c
 import dearpygui.simple as s
 
 from clockpuncher.database import Database
-from clockpuncher.gui import entry_table, settings_menu, task_chart, timer_display
+from clockpuncher.gui import (entry_table, settings_menu, task_chart,
+                              timer_display)
 from clockpuncher.gui.base_gui import BaseGUI
 from clockpuncher.models import Entry, Project
 
