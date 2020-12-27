@@ -1,7 +1,8 @@
 [tool.poetry]
 name = "clockpuncher"
-version = "0.1.0"
+version = "0.1.1"
 description = "A hackable GUI time tracker designed to be easily modified for user-centric automation."
+readme = "README.md"
 authors = ["Erin Maestas <ErinLMaestas@gmail.com>"]
 license = "MIT"
 
@@ -25,4 +26,5 @@ build-backend = "poetry.core.masonry.api"
 [tool.poetry.scripts]
 clockpuncher = "clockpuncher.main:main"
 [tool.poetry.urls]
+homepage = "https://github.com/ErinMyLungs/AnalyticStopwatch"
 issues = "https://github.com/ErinMyLungs/AnalyticStopwatch/issues"

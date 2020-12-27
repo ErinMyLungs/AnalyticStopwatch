@@ -12,6 +12,14 @@ The end-goal is a local, open-source timer that is hackable and can automate spe
 ### Development GUI with logger and debugger windows
 ![Development View](./repo_resources/development_mode.png)
 
+## Installation
+
+The best way is to use [pipx](https://pipxproject.github.io/pipx/) and run `pipx install clockpuncher` or `pipx run clockpuncher`.
+
+On install a folder will be created in `~/.clockpuncher` to contain local data storage. It should contain a single folder 'data' with a sqlite db called `timer.db` and possibly wal files. It's literally just a sqlite database, you can access, query, and adjust as you would with any other database.
+
+You can delete this folder without issue, but you will lose all your stored data.
+
 ## Current Next Steps:
 * [X] Integrate sqlite DB of timer sessions
 * [X] Add inputs for specific task descriptions (text box)
@@ -23,6 +31,8 @@ The end-goal is a local, open-source timer that is hackable and can automate spe
 * [ ] Add tests for main.py + gui module
 * [X] Put on PyPI
 * [X] Setup with pipx for app deployment
+* [ ] Add user settings with persistent storage
+* [ ] Add database back-up/cold-storage option
 
 ## Repo Structure
 

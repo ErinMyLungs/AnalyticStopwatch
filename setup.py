@@ -9,22 +9,14 @@ DEPENDENCIES = ["dataset", "dearpygui", "pandas"]
 EXCLUDE_FROM_PACKAGES = ["tests*"]
 CURDIR = os.path.abspath(os.path.dirname(__file__))
 
-with io.open(os.path.join(CURDIR, "README.md"), "r", encoding="utf-8") as f:
+README_PATH = os.path.join(CURDIR, "README.md")
+with io.open(README_PATH, "r", encoding="utf-8") as f:
     README = f.read()
-
-
-def get_version():
-    main_file = os.path.join(CURDIR, "clockpuncher", "main.py")
-    _version_re = re.compile(r"__version__\s+=\s+(?P<version>.*)")
-    with open(main_file, "r", encoding="utf8") as f:
-        match = _version_re.search(f.read())
-        version = match.group("version") if match is not None else '"unknown"'
-    return str(ast.literal_eval(version))
 
 
 setup(
     name="clockpuncher",
-    version="0.1.0",
+    version="0.1.1",
     author="Erin Maestas",
     author_email="ErinLMaestas@gmail.com",
     description="A hackable GUI time tracker designed to be easily modified for user-centric automation.",
