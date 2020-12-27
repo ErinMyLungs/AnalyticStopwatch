@@ -1,4 +1,4 @@
-# Analytical Stopwatch
+# ClockPuncher
 
 ## Abstract
 
@@ -8,7 +8,7 @@ The end-goal is a local, open-source timer that is hackable and can automate spe
 
 ## Images
 ### 'Production' GUI for usage
-![Productions View](./repo_resources/pytoggl.gif)
+![Productions View](repo_resources/clockpuncher.gif)
 ### Development GUI with logger and debugger windows
 ![Development View](./repo_resources/development_mode.png)
 
@@ -21,8 +21,8 @@ The end-goal is a local, open-source timer that is hackable and can automate spe
   * [ ] Total Billed (per task and total)
 * [ ] Add report CSV output
 * [ ] Add tests for main.py + gui module
-* [ ] Put on PyPI
-* [ ] Setup with pipx for app deployment
+* [X] Put on PyPI
+* [X] Setup with pipx for app deployment
 
 ## Repo Structure
 
@@ -43,10 +43,3 @@ This repo follows a pretty standard layout with `main.py` being the GUI front-en
       * `timer.py` - Contains Timer and Number GUI components that make up the clock display
    * `tests` - Test suite using Pytest + Hypothesis
 
-### Testing Coverage
-
-Current stats:
-* database.py 92% covered
-* models.py 72% covered
-
-Currently, missing GUI tests.

@@ -1,4 +1,4 @@
-""" GUI module, contains BaseGUI class and PyTogglGUI subclass """
+""" Entrypoint and GUI definition for the Clockpuncher app """
 import datetime
 from typing import Optional
 
@@ -6,15 +6,14 @@ import dearpygui.core as c
 import dearpygui.simple as s
 
 from clockpuncher.database import Database
-from clockpuncher.gui import (entry_table, settings_menu, task_chart,
-                              timer_display)
+from clockpuncher.gui import entry_table, settings_menu, task_chart, timer_display
 from clockpuncher.gui.base_gui import BaseGUI
 from clockpuncher.models import Entry, Project
 
 
-class PyTogglGUI(BaseGUI):
+class ClockPuncher(BaseGUI):
     """
-    Stopwatch class, builds out the GUI portion of PyToggl
+    Stopwatch class, builds out the GUI portion of ClockPuncher
     """
 
     def __init__(self, **kwargs):
@@ -310,14 +309,16 @@ def main(development=False):
     :return: None
     """
 
-    gui = PyTogglGUI(development=development)
+    gui = ClockPuncher(development=development)
     gui.run()
 
 
 if __name__ == "__main__":
     import argparse
 
-    parser = argparse.ArgumentParser(description="Start PyToggl to track your hours.")
+    parser = argparse.ArgumentParser(
+        description="Start ClockPuncher to track your hours."
+    )
     parser.add_argument(
         "-X",
         "--development",
