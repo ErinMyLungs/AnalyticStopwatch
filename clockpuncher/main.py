@@ -4,8 +4,10 @@ from typing import Optional
 
 import dearpygui.core as c
 import dearpygui.simple as s
+
 from clockpuncher.database import Database
-from clockpuncher.gui import entry_table, task_chart, timer_display
+from clockpuncher.gui import (entry_table, settings_menu, task_chart,
+                              timer_display)
 from clockpuncher.gui.base_gui import BaseGUI
 from clockpuncher.models import Entry, Project
 
@@ -173,7 +175,7 @@ class PyTogglGUI(BaseGUI):
         Defines a simple window that takes inputs for creating a new project
         :return: On save inserts project data into database
         """
-        with s.window("Create New Project"):
+        with s.window("Create New Project", autosize=True):
             c.add_input_text("project_name##new_project")
             c.add_input_text("client##new_project")
             c.add_input_int("rate##new_project")
@@ -236,6 +238,7 @@ class PyTogglGUI(BaseGUI):
                     c.add_menu_item(
                         name="All Time", callback=self.filter_entries, check=True
                     )
+                settings_menu.create_menu()
 
             c.add_spacing(count=40, parent="Timer", before="Description")
             c.add_input_text(
