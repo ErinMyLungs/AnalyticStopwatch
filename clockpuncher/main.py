@@ -6,8 +6,7 @@ import dearpygui.core as c
 import dearpygui.simple as s
 
 from clockpuncher.database import Database
-from clockpuncher.gui import (entry_table, settings_menu, task_chart,
-                              timer_display)
+from clockpuncher.gui import entry_table, settings_menu, task_chart, timer_display
 from clockpuncher.gui.base_gui import BaseGUI
 from clockpuncher.models import Entry, Project
 
@@ -176,11 +175,29 @@ class PyTogglGUI(BaseGUI):
         :return: On save inserts project data into database
         """
         with s.window("Create New Project", autosize=True):
-            c.add_input_text("project_name##new_project")
-            c.add_input_text("client##new_project")
-            c.add_input_int("rate##new_project")
-            c.add_input_int("monthly_frequency##new_project")
-            c.add_input_int("weekly_hour_allotment##new_project")
+            c.add_input_text("project_name##new_project", label="Project Name")
+            c.add_input_text("client##new_project", label="Client")
+            c.add_slider_int(
+                "rate##new_project",
+                label="Billing Rate per hour",
+                max_value=100,
+                tip="ctrl+click to directly type the number",
+            )
+            c.add_slider_int(
+                "monthly_frequency##new_project",
+                label="Pay Frequency per Month",
+                default_value=2,
+                max_value=8,
+                tip="How frequently pay is given, default twice a month",
+            )
+            c.add_slider_int(
+                "weekly_hour_allotment##new_project",
+                label="Weekly Hours",
+                max_value=80,
+                default_value=20,
+                tip="Hours per week for project.",
+            )
+
             c.add_button("Save##SaveProject", callback=self.save_new_project)
 
     def select_project(self, _sender, data: str):
@@ -190,7 +207,6 @@ class PyTogglGUI(BaseGUI):
         :param data: data which contains selected project name
         :return: Sets main window title and self.selected_project
         """
-
         if self.selected_project is not None:
             c.configure_item(self.selected_project, check=False)
         self.selected_project = data
