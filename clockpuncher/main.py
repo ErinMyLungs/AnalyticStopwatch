@@ -9,6 +9,11 @@ from clockpuncher.database import Database
 from clockpuncher.gui import entry_table, settings_menu, task_chart, timer_display
 from clockpuncher.gui.base_gui import BaseGUI
 from clockpuncher.models import Entry, Project
+from clockpuncher.platform_local_storage import (
+    initialize_development_files,
+    initialize_production_files,
+    destroy_development_files,
+)
 
 
 class ClockPuncher(BaseGUI):
@@ -308,9 +313,19 @@ def main(development=False):
     Entrypoint function to run the GUI
     :return: None
     """
+    # Setup Data Files
+    if development:
+        initialize_development_files()
+    else:
+        initialize_production_files()
 
+    # Create GUI
     gui = ClockPuncher(development=development)
     gui.run()
+
+    # Teardown Development Files
+    if development:
+        destroy_development_files()
 
 
 if __name__ == "__main__":
@@ -327,4 +342,5 @@ if __name__ == "__main__":
         help="Launch in development mode with a fresh database that is wiped on next launch.",
     )
     args = parser.parse_args()
+
     main(development=args.development)

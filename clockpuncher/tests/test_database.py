@@ -7,6 +7,9 @@ from pathlib import Path
 
 import pytest
 from hypothesis import assume, given
+from platform_local_storage import (DEVELOPMENT_DB_PATH, PRODUCTION_DB_PATH,
+                                    destroy_development_files,
+                                    initialize_development_files)
 
 from clockpuncher.database import Database
 from clockpuncher.models import Entry, Project
@@ -14,9 +17,11 @@ from clockpuncher.tests.utils import (entry_build_strategy,
                                       project_build_strategy)
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture()
 def db() -> Database:
-    return Database(development=True)
+    initialize_development_files()
+    yield Database(development=True)
+    destroy_development_files()
 
 
 @pytest.fixture()
@@ -42,10 +47,10 @@ def seed_data():
 
 def test_intialization(db, seed_data):
     """
-    Tests that on creation a dataabase with projects and entries table is created
+    Tests that on creation a database with projects and entries table is created
     """
 
-    assert db.db.url == f"sqlite:///{Path().home()}/.clockpuncher/data/development.db"
+    assert db.db.url == f"sqlite:///{DEVELOPMENT_DB_PATH.as_posix()}"
 
     assert db.projects == db.db.get_table("projects")
     assert db.entries == db.db.get_table("entries")
@@ -61,7 +66,8 @@ def test_intialization(db, seed_data):
 
 def test_production_flag():
     db = Database()
-    assert db._db_uri != "sqlite:///clockpuncher/data/development.db"
+    assert db._db_uri != f"sqlite:///{DEVELOPMENT_DB_PATH.as_posix()}"
+    assert db._db_uri == f"sqlite:///{PRODUCTION_DB_PATH.as_posix()}"
 
 
 def test_get_project_names(db):

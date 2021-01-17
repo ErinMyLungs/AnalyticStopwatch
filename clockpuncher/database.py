@@ -6,7 +6,9 @@ from pathlib import Path
 from typing import Dict, List, Tuple, Union
 
 import dataset
+
 from clockpuncher.models import Entry, Project
+from clockpuncher.platform_local_storage import DEVELOPMENT_DB_PATH, PRODUCTION_DB_PATH
 
 
 def as_project(query):
@@ -48,22 +50,12 @@ class Database:
         :type development: bool
         """
         self.development = development
-        if development is True:
-            db_path = Path().home() / ".clockpuncher/data/development.db"
-            if db_path.exists():
-                db_path.unlink()
-            else:
-                db_path.parent.mkdir(parents=True, exist_ok=True)
-                db_path.touch(exist_ok=True)
-            db_uri = str(db_path.absolute())
+        if db_uri is not None:
+            db_uri = db_uri.as_posix()
+        elif development is True:
+            db_uri = DEVELOPMENT_DB_PATH.as_posix()
         else:
-            db_path = Path().home() / ".clockpuncher/data/timer.db"
-            if db_uri is None:
-                db_uri = str(db_path.absolute())
-
-                if db_path.exists is False:
-                    db_path.absolute().parent.mkdir(parents=True)
-                    db_path.touch()
+            db_uri = PRODUCTION_DB_PATH.as_posix()
 
         self._db_uri = f"sqlite:///{db_uri}" if db_uri.find("sqlite://") else db_uri
 
