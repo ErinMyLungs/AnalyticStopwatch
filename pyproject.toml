@@ -11,20 +11,21 @@ python = "^3.7"
 dataset = "^1.4.1"
 dearpygui = "^0.6.42"
 pandas = "^1.1.5"
+appdirs = "^1.4.4"
 
 [tool.poetry.dev-dependencies]
 isort = "^5.6.4"
 pylint = "^2.6.0"
 pytest = "^6.2.1"
 pytest-cov = "^2.10.1"
-hypothesis = {extras = ["cli"], version = "^5.43.4"}
-
-[build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+hypothesis = { extras = ["cli"], version = "^5.43.4" }
 
 [tool.poetry.scripts]
 clockpuncher = "clockpuncher.main:main"
 [tool.poetry.urls]
 homepage = "https://github.com/ErinMyLungs/AnalyticStopwatch"
 issues = "https://github.com/ErinMyLungs/AnalyticStopwatch/issues"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
