@@ -7,14 +7,16 @@ from pathlib import Path
 
 import pytest
 from hypothesis import assume, given
-from platform_local_storage import (DEVELOPMENT_DB_PATH, PRODUCTION_DB_PATH,
-                                    destroy_development_files,
-                                    initialize_development_files)
+from clockpuncher.platform_local_storage import (
+    DEVELOPMENT_DB_PATH,
+    PRODUCTION_DB_PATH,
+    destroy_development_files,
+    initialize_development_files,
+)
 
 from clockpuncher.database import Database
 from clockpuncher.models import Entry, Project
-from clockpuncher.tests.utils import (entry_build_strategy,
-                                      project_build_strategy)
+from clockpuncher.tests.utils import entry_build_strategy, project_build_strategy
 
 
 @pytest.fixture()

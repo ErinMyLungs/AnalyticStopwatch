@@ -1,9 +1,9 @@
 """ Tests for local storage """
 from unittest.mock import MagicMock, patch
 
-from platform_local_storage import (_check_if_file_exists_or_create,
-                                    initialize_development_files,
-                                    initialize_production_files)
+from clockpuncher.platform_local_storage import (
+    _check_if_file_exists_or_create, initialize_development_files,
+    initialize_production_files)
 
 
 def test_file_not_created_if_exists():

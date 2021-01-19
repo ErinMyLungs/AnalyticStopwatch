@@ -5,7 +5,8 @@ from typing import Optional
 
 import dearpygui.core as c
 import dearpygui.simple as s
-from platform_local_storage import DATA_DIR_PATH
+
+from clockpuncher.platform_local_storage import DATA_DIR_PATH
 
 
 class SettingMenu:
