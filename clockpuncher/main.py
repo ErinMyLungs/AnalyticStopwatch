@@ -10,9 +10,9 @@ from clockpuncher.gui import entry_table, settings_menu, task_chart, timer_displ
 from clockpuncher.gui.base_gui import BaseGUI
 from clockpuncher.models import Entry, Project
 from clockpuncher.platform_local_storage import (
+    destroy_development_files,
     initialize_development_files,
     initialize_production_files,
-    destroy_development_files,
 )
 
 
@@ -261,7 +261,7 @@ class ClockPuncher(BaseGUI):
                     )
                 settings_menu.create_menu()
 
-            c.add_spacing(count=40, parent="Timer", before="Description")
+            c.add_spacing(count=40)
             c.add_input_text(
                 name="Description", default_value="coding", label="Description"
             )

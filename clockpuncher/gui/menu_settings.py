@@ -1,11 +1,11 @@
 """ Contains settings menu component class """
 import subprocess
 import sys
-from pathlib import Path
 from typing import Optional
 
 import dearpygui.core as c
 import dearpygui.simple as s
+from platform_local_storage import DATA_DIR_PATH
 
 
 class SettingMenu:
@@ -45,8 +45,7 @@ class SettingMenu:
         :param _args:  sender/data args
         :return: Opens the file GUI explorer hopefully
         """
-        expected_path = Path().home() / ".clockpuncher"
-        path_str = str(expected_path.absolute())
+        path_str = DATA_DIR_PATH.as_posix()
         open_functions = {
             "linux": lambda: subprocess.check_call(["xdg-open", path_str]),
             "win32": lambda: subprocess.check_call(["explorer", "/select", path_str]),
