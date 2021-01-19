@@ -16,7 +16,7 @@ The end-goal is a local, open-source timer that is hackable and can automate spe
 
 The best way is to use [pipx](https://pipxproject.github.io/pipx/) and run `pipx install clockpuncher` or `pipx run clockpuncher`.
 
-On install a folder will be created in `~/.clockpuncher` to contain local data storage. It should contain a single folder 'data' with a sqlite db called `timer.db` and possibly wal files. It's literally just a sqlite database, you can access, query, and adjust as you would with any other database.
+On install a folder will be created in `~/.local/Clockpuncher` to contain local data storage. It should contain a sqlite db called `timer.db` and possibly wal files. It's literally just a sqlite database, you can access, query, and adjust as you would with any other database. This might be slightly different depending on your OS.
 
 You can delete this folder without issue, but you will lose all your stored data.
 
@@ -45,6 +45,7 @@ This repo follows a pretty standard layout with `main.py` being the GUI front-en
    * `main.py` - The main file that combines GUI, database, and application logic to make the above images
    * `database.py` - Contains the Database class that does CRUD operations for main.py
    * `models.py` - Dataclasses that represent rows in the Entries and Projects table
+   * `platform_local_storage.py` - Local storage location constants for 
    * `data/` - Contains local data storage. In production it stores data in `data/timer.db`
    * `gui/` - All reusable GUI components
      * `base_gui.py` - Base GUI class with loggers and basic development/production switchers.
