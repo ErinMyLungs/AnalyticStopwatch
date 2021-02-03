@@ -8,7 +8,8 @@ from typing import Dict, List, Tuple, Union
 import dataset
 
 from clockpuncher.models import Entry, Project
-from clockpuncher.platform_local_storage import DEVELOPMENT_DB_PATH, PRODUCTION_DB_PATH
+from clockpuncher.platform_local_storage import (DEVELOPMENT_DB_PATH,
+                                                 PRODUCTION_DB_PATH)
 
 
 def as_project(query):

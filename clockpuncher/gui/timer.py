@@ -173,7 +173,7 @@ class Number:
 
     def run(self):
         """
-        A very basic stand-aloen run method to show what this looks like by default
+        A very basic stand-alone run method to show what this looks like by default
         :return: General number display example
         """
         base = BaseGUI(development=True)
