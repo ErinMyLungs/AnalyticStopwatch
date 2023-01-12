@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "clockpuncher"
-version = "0.1.3"
+version = "0.1.4"
 description = "A hackable GUI time tracker designed to be easily modified for user-centric automation."
 readme = "README.md"
 authors = ["Erin Maestas <ErinLMaestas@gmail.com>"]
@@ -9,8 +9,7 @@ license = "MIT"
 [tool.poetry.dependencies]
 python = "^3.7"
 dataset = "^1.4.1"
-dearpygui = "0.6.121"
-pandas = "^1.1.5"
+dearpygui = "0.6.415"
 appdirs = "^1.4.4"
 
 [tool.poetry.dev-dependencies]
